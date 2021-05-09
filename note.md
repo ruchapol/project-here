@@ -1,0 +1,3 @@
+TODO:
+- BACKEND API
+- VISUALIZE for เล่ม
