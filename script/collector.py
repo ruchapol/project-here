@@ -32,6 +32,6 @@ def run():
     with open('./data/data1.json', 'r', encoding='utf-8') as f:
         y = json.loads(f.read(), object_hook=decoder)
     print(x.RWS[0].RW[0].FIS[0].FI[0].TMC.DE)
-    print(y.RWS[0].RW[0].FIS[0].FI[0].TMC.DE)
+    print(y.RWS[0].RW[0].FIS[0].FI[0].CF[0].CN)
 
 

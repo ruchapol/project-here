@@ -8,7 +8,7 @@ class Ty(Enum):
     TR = "TR"
 
 
-class CF:
+class CF_INFO:
     TY: Ty
     SP: float
     SU: float
@@ -45,9 +45,9 @@ class Tmc:
 
 class FiFi:
     TMC: Tmc
-    CF: List[CF]
+    CF: List[CF_INFO]
 
-    def __init__(self, tmc: Tmc, cf: List[CF]) -> None:
+    def __init__(self, tmc: Tmc, cf: List[CF_INFO]) -> None:
         self.TMC = tmc
         self.CF = cf
 
