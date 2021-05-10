@@ -1,4 +1,4 @@
-from interfaceConcept.reporter import Reporter
+from playground.interfaceConcept.reporter import Reporter
 
 class PetInteface:
     def run(self) -> str:
