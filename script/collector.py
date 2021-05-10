@@ -1,6 +1,6 @@
 import requests
 import json
-from model.model import HereApiResult
+from model.HereApiResult import HereApiResult
 from collections import namedtuple
 
 # parameters = {"app_id": "wwcWhGYZ5l7CgKOMisYT", "app_code": "IdjdLPBAG-tfDKm2J35YxA",

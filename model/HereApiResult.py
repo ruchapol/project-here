@@ -106,3 +106,12 @@ class HereApiResult:
         self.CREATED_TIMESTAMP = created_timestamp
         self.VERSION = version
         self.UNITS = units
+class IRepository:
+    def find(self):
+        raise NotImplementedError
+
+    def findAll(self):
+        raise NotImplementedError
+
+    def save(self):
+        raise NotImplementedError
