@@ -1,5 +1,5 @@
-from interfaceConcept.reporter import Reporter
-from interfaceConcept.main import Cat
+from playground.interfaceConcept.reporter import Reporter
+from playground.interfaceConcept.main import Cat
 import unittest
 
 class TestCatClass(unittest.TestCase):

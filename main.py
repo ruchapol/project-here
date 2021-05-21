@@ -1,6 +1,6 @@
-from script.collector import run
+from script.collector import runXML
 
 
 if __name__ == '__main__':
-    run()
+    runXML()
 
