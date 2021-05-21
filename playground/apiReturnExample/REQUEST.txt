@@ -1,0 +1,12 @@
+REQUEST
+{}
+
+RESPONSE
+{
+    "road_li": {
+        "road_pc": [jf_number, jf_color]
+    }
+}
+
+
+MODEL FOR TRAIN has 5 for each [5, 10, 15, 45] minutes
