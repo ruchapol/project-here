@@ -1,5 +1,6 @@
+from typing import Dict
 class IRepository:
-    def find(self):
+    def find(self, args: Dict):
         raise NotImplementedError
 
     def findAll(self):

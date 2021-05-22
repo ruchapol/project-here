@@ -10,4 +10,12 @@ class Feature:
     NeightbourJamFactorDuration: int
     TimeStamp: str
 
+
+# have only one feature extraction instance
+#    def getPreviousFeatureByID(id: ID) -> Feature:
+
+
+# def _getPreviousFeature(id: ID)
+
+# def _calJamtorDuration(jf: float, previous_duration: int)
     

@@ -1,3 +1,4 @@
+from model.featureExtraction.input import APIInput
 import requests
 import json
 import os
@@ -40,5 +41,8 @@ def runJSON():
 def runXML():
     xmlPraser = TfXmlPraser()
     tf_dict = xmlPraser.parseFile(getPath(xmlPATH))
+    # convert to Feature Input
+    APIInput
     for li, pc in tf_dict:
         print(li, pc, ":", tf_dict[(li, pc)])
+        

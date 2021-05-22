@@ -1,15 +1,37 @@
+from __future__ import annotations
 from typing import List
-
+from model.ID import ID
 
 class IGraph:
-    def getNodeByID(self, id:Tuple[RoadID:str, SegmentID:str]) -> INode:
+    def addNode(self, node: INode):
+        raise NotImplementedError
+    
+    def getNodeByID(self, id: ID) -> INode:
         raise NotImplementedError
 
 class INode:
-    def inboundNodes(self) -> List[INode]:
+    def setID(self,id: ID) -> ID:
         raise NotImplementedError
 
-    def outboundNodes(self) -> List[INode]:
+    def getID(self) -> ID:
+        raise NotImplementedError
+
+    def getRoadName(self) -> str:
+        raise NotImplementedError
+
+    def getSegmentName(self) -> str:
+        raise NotImplementedError
+
+    def addInboundNode(self, node: INode):
+        raise NotImplementedError
+
+    def addOutboundNode(self, node: INode):
+        raise NotImplementedError
+
+    def getInboundNodes(self) -> List[INode]:
+        raise NotImplementedError
+
+    def getOutboundNodes(self) -> List[INode]:
         raise NotImplementedError
 
     def getNeighbourNodes(self) -> List[INode]:

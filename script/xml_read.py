@@ -2,12 +2,13 @@ from datetime import datetime
 from dateutil import tz
 from xml.dom import minidom
 import xml.etree.ElementTree as ET
-from model.featureExtraction.input import Input
+from model.featureExtraction.input import APIInput
 
 class TfXmlPraser:
     def __init__(self):
         pass
 
+# seave 121324
 
     def getTime(timeStamp):
         from_zone = tz.gettz('UTC')
