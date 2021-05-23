@@ -50,11 +50,9 @@ def query(roadSegmentDAO):
     # print("hi")
     t= roadSegmentDAO["219+57496","57499"]
     print("original: ", t)    
-    for x in t.From:
-        print(x.From, x.To)
-    print("------------")
-    for x in t.To:
-        print(x)
+    a = [x.To for x in t.From]
+    a = [(x.RoadID,x.RoadSegmentID) for x in a]
+    print(a)
     return t
 
 

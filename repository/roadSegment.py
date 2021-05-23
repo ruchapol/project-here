@@ -19,7 +19,8 @@ class RoadSegmentRepo(IRepository):
     def find(self, id: ID) -> RoadSegmentDTO:
         dao = self.roadSegmentDAO[id.RoadID, id.SegmentID]
         roadSegmentDTO: RoadSegmentDTO = dao
-        roadSegmentDTO.To = [t.To for t in dao.From]
+        toTmp = [t.To for t in dao.From]
+        roadSegmentDTO.To = [ID(x.RoadID,x.RoadSegmentID) for x in toTmp]
         return roadSegmentDTO
 
     def findAll(self) -> List[RoadSegmentDTO]:
