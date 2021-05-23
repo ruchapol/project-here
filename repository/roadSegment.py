@@ -23,8 +23,21 @@ class RoadSegmentRepo(IRepository):
         roadSegmentDTO.To = [ID(x.RoadID,x.RoadSegmentID) for x in toTmp]
         return roadSegmentDTO
 
+    @db_session
     def findAll(self) -> List[RoadSegmentDTO]:
-        return [self.data]
+        roadSegmentsDAO = select(x for x in self.roadSegmentDAO)
+        roadSegments :List[RoadSegmentDTO] = []
+        for segment in roadSegmentsDAO:
+            newRoadSegment = RoadSegmentDTO()
+            newRoadSegment.RoadID = segment.RoadID
+            newRoadSegment.RoadSegmentID = segment.RoadSegmentID
+            newRoadSegment.RoadDescription = segment.RoadDescription
+            newRoadSegment.RoadSegmentDescription = segment.RoadSegmentDescription
+            newRoadSegment.LatLong = segment.LatLong
+            toTmp = [t.To for t in segment.From]
+            newRoadSegment.To = [ID(x.RoadID,x.RoadSegmentID) for x in toTmp]
+            roadSegments.append(newRoadSegment)
+        return roadSegments
 
     def save(self, data):
         super().save(self)

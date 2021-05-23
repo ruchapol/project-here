@@ -4,6 +4,7 @@ from pony import orm
 from model.database.roadSegment import *
 from pony.orm import db_session, select, get
 from typing import Dict, List
+from model.ID import ID
 import csv
 
 roadSegmentPath = [".", "data", "geo_with_ajacant.csv"]
@@ -48,12 +49,23 @@ def query(roadSegmentDAO):
     # for i in q:
     #     print(i)
     # print("hi")
-    t= roadSegmentDAO["219+57496","57499"]
-    print("original: ", t)    
-    a = [x.To for x in t.From]
-    a = [(x.RoadID,x.RoadSegmentID) for x in a]
-    print(a)
-    return t
+    t = select(x for x in roadSegmentDAO)
+    r :List[RoadSegmentDTO] = []
+    for a in t:
+        new_r = RoadSegmentDTO()
+        new_r.RoadID = a.RoadID
+        new_r.RoadSegmentID = a.RoadSegmentID
+        new_r.RoadDescription = a.RoadDescription
+        new_r.RoadSegmentDescription = a.RoadSegmentDescription
+        new_r.LatLong = a.LatLong
+        toTmp = [t.To for t in a.From]
+        new_r.To = [ID(x.RoadID,x.RoadSegmentID) for x in toTmp]
+        r.append(new_r)
+    # print("original: ", t)    
+    # a = [x.To for x in t.From]
+    # a = [(x.RoadID,x.RoadSegmentID) for x in a]
+    # print(a)
+    return r
 
 
 @db_session
@@ -119,5 +131,7 @@ def migrate():
 
     # read file and put to db
     # insert_database(roadSegmentDAO, outboundDAO)
-    query(roadSegmentDAO)
+    t=query(roadSegmentDAO)
+    for a in t:
+        print(a.RoadID,a.RoadSegmentID, a.To)
 

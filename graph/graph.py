@@ -1,14 +1,20 @@
 from __future__ import annotations
+from interface.repository import IRepository
 from typing import List, Dict
 from interface.graph import IGraph, INode
 from model.ID import ID
 
 class Graph(IGraph):
     nodes: Dict[ID, INode]
-    def __init__(self) -> IGraph:
+    roadSegmentRepo: IRepository
+    def __init__(self) -> Graph:
         self.nodes = {}
+        self.buildGraph()
 
-    def addNode(self, node: INode):
+    def buildGraph():
+        pass
+
+    def addNode(self, node: INode) -> INode:
         self.nodes[node.getID()] = node
 
     def getNodeByID(self, id: ID) -> INode:
