@@ -6,7 +6,7 @@ from model.HereApiResult import HereApiResult
 from collections import namedtuple
 from script.xml_read import TfXmlPraser
 from typing import List
-
+from utils.path import getPath
 
 jsonPATH = [".","data","data.json"]
 xmlPATH = [".","data","data.xml"]
@@ -24,9 +24,6 @@ def writeFileJSON():
 def decoder(hereApiDict):
     return namedtuple('Wow', hereApiDict.keys())(*hereApiDict.values())
 
-def getPath(arrayPath: List[str]):
-    return os.path.join(*arrayPath) # spread array
-
 def runJSON():
     x: HereApiResult = None
     y: HereApiResult = None
@@ -42,7 +39,6 @@ def runXML():
     xmlPraser = TfXmlPraser()
     tf_dict = xmlPraser.parseFile(getPath(xmlPATH))
     # convert to Feature Input
-    APIInput
     for li, pc in tf_dict:
         print(li, pc, ":", tf_dict[(li, pc)])
         

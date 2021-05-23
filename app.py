@@ -1,8 +1,8 @@
 from flask import Flask
-from service.plus import PlusService
+from api.service.plus import PlusService
 from repository.traffic import TrafficRepo
-from controller.traffic_flow import getBlueprint
-from controller.health import health_blueprint
+from api.controller.traffic_flow import getBlueprint
+from api.controller.health import health_blueprint
 
 app = Flask(__name__)
 # Repo
