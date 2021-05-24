@@ -1,24 +1,47 @@
 from __future__ import annotations
+from model.database.roadSegment import RoadSegmentDTO
 from interface.repository import IRepository
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from interface.graph import IGraph, INode
 from model.ID import ID
 
 class Graph(IGraph):
     nodes: Dict[ID, INode]
     roadSegmentRepo: IRepository
-    def __init__(self) -> Graph:
+
+    def __init__(self, repo) -> Graph:
         self.nodes = {}
+        self.roadSegmentRepo = repo
         self.buildGraph()
 
-    def buildGraph():
-        pass
+    def buildGraph(self):
+        roadSegments: Dict[ID, RoadSegmentDTO] = self.roadSegmentRepo.findAll()
+        for ID in roadSegments:
+            OutboundIDS: List[ID] = roadSegments[ID].To
+            node = self.getNodeOrCreate(ID, roadSegments[ID])
+
+            for OID in OutboundIDS:
+                node.addOutboundNode(
+                    self.getNodeOrCreate(OID, roadSegments[OID]))
+
+    def getNodeOrCreate(self, id: ID, roadSegment: RoadSegmentDTO) -> INode:
+        node = self.getNodeByID(id)
+        if node is not None:
+            return node
+        RoadDescription = roadSegment.RoadDescription
+        RoadSegmentDescription = roadSegment.RoadSegmentDescription
+        node = Node(id, RoadDescription, RoadSegmentDescription)
+        self.addNode(node)
+        return node
 
     def addNode(self, node: INode) -> INode:
         self.nodes[node.getID()] = node
 
     def getNodeByID(self, id: ID) -> INode:
-        return self.nodes[id]
+        if id in self.nodes:
+            return self.nodes[id]
+        return None
+
 
 class Node(INode):
     id: ID
@@ -30,12 +53,12 @@ class Node(INode):
 
     def __init__(self, id: ID, roadName: str, segmentName: str) -> Node:
         self.id = id
-        self.roadName= roadName
+        self.roadName = roadName
         self.segmentName = segmentName
         self.inboundNodes = []
         self.outboundNodes = []
-    
-    def setID(self,id: ID) -> ID:
+
+    def setID(self, id: ID) -> ID:
         self.id = id
 
     def getID(self) -> ID:
@@ -67,4 +90,3 @@ class Node(INode):
 
     def getOutboundNodes(self) -> List[Node]:
         return self.outboundNodes
- 

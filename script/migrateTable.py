@@ -2,6 +2,7 @@ from utils.path import getPath
 from playground.play_untangle import run
 from pony import orm
 from model.database.roadSegment import *
+from model.database.feature import *
 from pony.orm import db_session, select, get
 from typing import Dict, List
 from model.ID import ID
@@ -121,17 +122,15 @@ def insert_database(roadSegmentDAO, outboundDAO):
                         remainOutbound[outboundRoad] = [currentRoad]
 
 
-def migrate():
-    # create db
-    db = orm.Database()
-    db.bind(provider='sqlite', filename='database.db', create_db=True)
-    roadSegmentDAO = roadSegment_DAO(db, orm)
-    outboundDAO = outbound_DAO(db, orm, roadSegmentDAO)
+def migrate(db: orm.Database):
+    roadSegmentDAO = createRoadSegmentDAO(db, orm)
+    outboundDAO = createOutboundDAO(db, orm, roadSegmentDAO)
+    datasetDAO = createDatasetDAO(db, orm, roadSegmentDAO)
     db.generate_mapping(create_tables=True)
 
     # read file and put to db
-    # insert_database(roadSegmentDAO, outboundDAO)
-    t=query(roadSegmentDAO)
-    for a in t:
-        print(a.RoadID,a.RoadSegmentID, a.To)
+    insert_database(roadSegmentDAO, outboundDAO)
+    # t=query(roadSegmentDAO)
+    # for a in t:
+    #     print(a.RoadID,a.RoadSegmentID, a.To)
 

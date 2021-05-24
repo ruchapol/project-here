@@ -18,7 +18,7 @@ class OutboundDTO:
     From: RoadSegmentDTO  # point to RowID
     To: RoadSegmentDTO  # point to RowID
 
-def roadSegment_DAO(db: Database, orm: orm):
+def createRoadSegmentDAO(db: Database, orm: orm):
     class RoadSegment(db.Entity):
         _table_ = 'RoadSegment'
         # RowID: int = orm.PrimaryKey(int, auto=True)
@@ -29,15 +29,16 @@ def roadSegment_DAO(db: Database, orm: orm):
         LatLong: str = orm.Required(str)
         From = orm.Set('Outbound', reverse='From')
         To = orm.Set('Outbound', reverse='To')
+        HasFeatures = orm.Set('DataSet', reverse='RoadSegment')
         RowID: orm.PrimaryKey(RoadID, RoadSegmentID)
     return RoadSegment
 
 
-def outbound_DAO(db: Database, orm: orm, RoadSegment):
+def createOutboundDAO(db: Database, orm: orm, RoadSegmentDAO):
     class Outbound(db.Entity):
         _table_ = 'Outbound'
         OutboundID: int = orm.PrimaryKey(int, auto=True)
-        From = orm.Required(RoadSegment, reverse = 'From')
-        To = orm.Required(RoadSegment, reverse = 'To')
+        From = orm.Required(RoadSegmentDAO, reverse = 'From')
+        To = orm.Required(RoadSegmentDAO, reverse = 'To')
     return Outbound
 
