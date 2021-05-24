@@ -5,8 +5,9 @@ import os
 from model.HereApiResult import HereApiResult
 from collections import namedtuple
 from script.xml_read import TfXmlPraser
-from typing import List
+from typing import List, Dict
 from utils.path import getPath
+from model.ID import ID
 
 jsonPATH = [".","data","data.json"]
 xmlPATH = [".","data","data.xml"]
@@ -39,17 +40,18 @@ def runXML(xmlPATH: List[str]) -> List[APIInput]:
     xmlPraser = TfXmlPraser()
     tf_dict = xmlPraser.parseFile(getPath(xmlPATH))
     # convert to Feature Input
-    apiInputs: List[APIInput] = []
+    apiInputs: Dict[ID,APIInput] = {}
     for li, pc in tf_dict:
         # print(li, pc, ":", tf_dict[(li, pc)])
         currentData = tf_dict[(li, pc)]
         newInput = APIInput()
         newInput.RoadID = li
         newInput.SegmentID = pc
+        newID = ID(li, pc)
         newInput.DateTime = currentData['datetime']
         newInput.SpeedUncut = currentData['su']
         newInput.JamFactor = currentData['jf']
         newInput.Confident = currentData['confident']
-        apiInputs.append(newInput)
+        apiInputs[newID] = newInput
     return apiInputs
         

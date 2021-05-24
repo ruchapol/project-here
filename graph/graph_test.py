@@ -14,10 +14,6 @@ class TestGraph(unittest.TestCase):
         node2 = Node(ID("roadA", "segmentB"), "ROAD A", "segmentB")
         node3 = Node(ID("roadZ", "segmentC"), "ROAD Z", "segmentC")
 
-        node1.addOutboundNode(node2)
-        node2.addOutboundNode(node3)
-        node3.addOutboundNode(node1)
-
         graph.addNode(node1)
         graph.addNode(node2)
         graph.addNode(node3)

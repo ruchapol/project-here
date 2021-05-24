@@ -2,7 +2,7 @@ from pony import orm
 from pony.orm.core import Database
 from model.ID import ID
 
-class FeatureDTO:
+class DataSetDTO:
     ID: ID
     DayOfWeek: int
     Day: int

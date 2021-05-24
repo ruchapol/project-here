@@ -9,12 +9,12 @@ class Graph(IGraph):
     nodes: Dict[ID, INode]
     roadSegmentRepo: IRepository
 
-    def __init__(self, repo) -> Graph:
+    def __init__(self, repo: IRepository) -> Graph:
         self.nodes = {}
         self.roadSegmentRepo = repo
-        self.buildGraph()
+        self._buildGraph()
 
-    def buildGraph(self):
+    def _buildGraph(self):
         roadSegments: Dict[ID, RoadSegmentDTO] = self.roadSegmentRepo.findAll()
         for ID in roadSegments:
             OutboundIDS: List[ID] = roadSegments[ID].To

@@ -4,16 +4,16 @@ from interface.graph import IGraph
 from interface.featureExtraction import IFeatureExtraction, ID
 from model.featureExtraction.input import APIInput
 from model.featureExtraction.feature import Feature
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 
 class FeatureExtraction(IFeatureExtraction):
-    data: List[APIInput]
-    repo: IRepository
+    APIInputs: Dict[ID, APIInput]
+    featureRepo: IRepository
     graph: IGraph
-    def __init__(self, data: List[APIInput], repo: IRepository, graph: IGraph):
-        self.data = data
-        self.repo = repo
+    def __init__(self, data: Dict[ID, APIInput], repo: IRepository, graph: IGraph):
+        self.APIInputs = data
+        self.featureRepo = repo
         self.graph = graph
 
     def processInput(self, x: List[APIInput]):
@@ -22,14 +22,18 @@ class FeatureExtraction(IFeatureExtraction):
         return 1
 
     def saveToDB(self, id: ID, features: List[Feature], su: List[float]):
-        self.repo.save(features)
+        self.featureRepo.save(features)
 
 #   def _calJamFactorDuration(self, id:ID, ) -> float:
 
 #   def _calDeltaJamFactor(self, id:ID, ) -> float:
 
-#   def _calNeightbourJamFactor(self, id:ID, ) -> float:
-#       use graph dependency
+    def calNeightbourJamFactor(self, id:ID) -> float:
+        v = 0
+        neighbours = self.graph.getNodeByID(id).getNeighbourNodes()
+        for neightbour in neighbours:
+            v += self.APIInputs[neightbour.getID()].JamFactor
+        return v / len(neighbours)
 
 #   def _calNeightbourJamFactorDuration(self, id:ID) -> float:
 #       may be call _calNeightbourJamFactor()

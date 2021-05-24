@@ -9,12 +9,9 @@ from model.ID import ID
 class RoadSegmentRepo(IRepository):
     roadSegmentDAO = None
     outboundDAO = None
-    db: orm.Database
-    def __init__(self, db: orm.Database):
-        self.db = db
-        self.roadSegmentDAO = createRoadSegmentDAO(db, orm)
-        self.outboundDAO = createOutboundDAO(db, orm, self.roadSegmentDAO)
-        self.db.generate_mapping(create_tables=True)
+    def __init__(self, roadSegmentDAO, outboundDAO):
+        self.roadSegmentDAO = roadSegmentDAO
+        self.outboundDAO = outboundDAO
 
 
     @db_session
