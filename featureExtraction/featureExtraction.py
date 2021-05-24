@@ -11,7 +11,7 @@ class FeatureExtraction(IFeatureExtraction):
     data: List[APIInput]
     repo: IRepository
     graph: IGraph
-    def __init__(self, data: APIInput, repo: IRepository, graph: IGraph):
+    def __init__(self, data: List[APIInput], repo: IRepository, graph: IGraph):
         self.data = data
         self.repo = repo
         self.graph = graph

@@ -35,10 +35,21 @@ def runJSON():
     print(y.RWS[0].RW[0].FIS[0].FI[0].CF[0].CN)
 
 
-def runXML():
+def runXML(xmlPATH: List[str]) -> List[APIInput]:
     xmlPraser = TfXmlPraser()
     tf_dict = xmlPraser.parseFile(getPath(xmlPATH))
     # convert to Feature Input
+    apiInputs: List[APIInput] = []
     for li, pc in tf_dict:
-        print(li, pc, ":", tf_dict[(li, pc)])
+        # print(li, pc, ":", tf_dict[(li, pc)])
+        currentData = tf_dict[(li, pc)]
+        newInput = APIInput()
+        newInput.RoadID = li
+        newInput.SegmentID = pc
+        newInput.DateTime = currentData['datetime']
+        newInput.SpeedUncut = currentData['su']
+        newInput.JamFactor = currentData['jf']
+        newInput.Confident = currentData['confident']
+        apiInputs.append(newInput)
+    return apiInputs
         

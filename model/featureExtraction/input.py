@@ -5,6 +5,6 @@ class APIInput:
     RoadID: str
     SegmentID: str
     DateTime: str
-    SpeedUnCut: float
+    SpeedUncut: float
     JamFactor: float
     Confident: float
