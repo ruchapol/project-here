@@ -1,13 +1,15 @@
+from model.database.dataset import DataSetDTO
 import unittest
 from featureExtraction.featureExtraction import FeatureExtraction
 from model.ID import ID
-from typing import Dict
+from typing import Dict, List
 from interface.repository import IRepository
 from interface.graph import IGraph, INode
 from model.featureExtraction.input import APIInput
-from graph.graph_mock import GraphMock 
+from graph.graph_mock import GraphMock
 from graph.graph import Node
 from repository.dataSet_mock import DataSetRepoMock
+
 
 class TestFeatureExtraction(unittest.TestCase):
     featureExtraction: FeatureExtraction
@@ -25,32 +27,101 @@ class TestFeatureExtraction(unittest.TestCase):
         }
         return nodes
 
-    
-    def setUp(self):
-        # A --> B --> C
+    def _prepareRepo(self) -> Dict[ID, List[DataSetDTO]]:
+        datasets  = {
+            ID("B", "B1"): [
+                DataSetDTO().timestamp("2021-05-09T05:56:31Z").jamFactorDuration(10).jamFactor(3),
+                DataSetDTO().timestamp("2021-05-09T05:47:31Z").jamFactorDuration(20)
+            ]
+        }
+        repo: DataSetRepoMock = DataSetRepoMock(datasets)
+        return repo
+
+    def _prepareAPIInput_for_calNeightbourJamFactor(self) -> Dict[ID, APIInput]:
         apiInputs: Dict[ID, APIInput] = {
             ID("A", "A1"): APIInput().speedUncut(10).jamFactor(1),
             ID("B", "B1"): APIInput().speedUncut(20).jamFactor(2),
             ID("C", "C1"): APIInput().speedUncut(30).jamFactor(3),
         }
-        repo: IRepository = DataSetRepoMock()
-        nodes = self._createABCNodes()
-        graph: IGraph = GraphMock(nodes)
-        self.featureExtraction = FeatureExtraction(apiInputs, repo, graph)
+        return apiInputs
+
+    def _prepareAPIInput_for_calJamFactorDuration(self, jf: float, dateTime: str) -> Dict[ID, APIInput]:
+        apiInputs: Dict[ID, APIInput] = {
+            ID("A", "A1"): APIInput().speedUncut(10).jamFactor(1),
+            ID("B", "B1"): APIInput().speedUncut(20).jamFactor(jf).dateTime(dateTime),
+            ID("C", "C1"): APIInput().speedUncut(30).jamFactor(3),
+        }
+        return apiInputs
+
+    def setUp(self):
+        # A --> B --> C
+        pass
 
     def tearDown(self):
         pass
 
     def test_calNeightbourJamFactor(self):
-        neightbourJFActual = self.featureExtraction.calNeightbourJamFactor(ID("B", "B1"))
+        # prepare data
+        apiInputs: Dict[ID, APIInput] = self._prepareAPIInput_for_calNeightbourJamFactor()
+        nodes = self._createABCNodes()
+        graph: IGraph = GraphMock(nodes)
+        self.featureExtraction = FeatureExtraction(
+            apiInputs, self._prepareRepo(), graph)
+
+        # execute
+        neightbourJFActual = self.featureExtraction.calNeightbourJamFactor(
+            ID("B", "B1"))
+
+        # assertion
         self.assertEqual(neightbourJFActual, 2)
 
     def test_calJamFactorDuration(self):
-        pass
+        # prepare data
+        apiInputs: Dict[ID, APIInput] = self._prepareAPIInput_for_calJamFactorDuration(2.85, "2021-05-09T05:59:31Z")
+        nodes = self._createABCNodes()
+        graph: IGraph = GraphMock(nodes)
+        self.featureExtraction = FeatureExtraction(
+            apiInputs, self._prepareRepo(), graph)
+
+        # execute
+        jamFactorDuration = self.featureExtraction.calJamFactorDuration(
+            ID("B", "B1"))
+
+        # assertion
+        self.assertEqual(jamFactorDuration, 13)
+    
+    def test_calJamFactorDuration_timeExceed(self):
+        # prepare data
+        apiInputs: Dict[ID, APIInput] = self._prepareAPIInput_for_calJamFactorDuration(2.85, "2021-05-09T06:20:31Z")
+        nodes = self._createABCNodes()
+        graph: IGraph = GraphMock(nodes)
+        self.featureExtraction = FeatureExtraction(
+            apiInputs, self._prepareRepo(), graph)
+
+        # execute
+        jamFactorDuration = self.featureExtraction.calJamFactorDuration(
+            ID("B", "B1"))
+
+        # assertion
+        self.assertEqual(jamFactorDuration, None)
+
+    def test_calJamFactorDuration_thresholdExceed(self):
+        # prepare data
+        apiInputs: Dict[ID, APIInput] = self._prepareAPIInput_for_calJamFactorDuration(2.5, "2021-05-09T05:59:31Z")
+        nodes = self._createABCNodes()
+        graph: IGraph = GraphMock(nodes)
+        self.featureExtraction = FeatureExtraction(
+            apiInputs, self._prepareRepo(), graph)
+
+        # execute
+        jamFactorDuration = self.featureExtraction.calJamFactorDuration(
+            ID("B", "B1"))
+
+        # assertion
+        self.assertEqual(jamFactorDuration, 0)
 
     def test_calDeltaJamFactor(self):
         pass
-
 
     def test_calNeightbourJamFactorDuration(self):
         pass

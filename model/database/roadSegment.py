@@ -29,7 +29,7 @@ def createRoadSegmentDAO(db: Database, orm: orm):
         LatLong: str = orm.Required(str)
         From = orm.Set('Outbound', reverse='From')
         To = orm.Set('Outbound', reverse='To')
-        HasFeatures = orm.Set('DataSet', reverse='RoadSegment')
+        Features = orm.Set('DataSet', reverse='RoadSegment')
         RowID: orm.PrimaryKey(RoadID, RoadSegmentID)
     return RoadSegment
 

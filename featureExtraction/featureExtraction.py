@@ -1,3 +1,4 @@
+from model.database.dataset import DataSetDTO
 from model.HereApiResult import HereApiResult
 from interface.repository import IRepository
 from interface.graph import IGraph
@@ -5,7 +6,8 @@ from interface.featureExtraction import IFeatureExtraction, ID
 from model.featureExtraction.input import APIInput
 from model.featureExtraction.feature import Feature
 from typing import List, Tuple, Dict
-
+from repository.dataSet import QueryOption
+from datetime import datetime
 
 class FeatureExtraction(IFeatureExtraction):
     APIInputs: Dict[ID, APIInput]
@@ -24,7 +26,42 @@ class FeatureExtraction(IFeatureExtraction):
     def saveToDB(self, id: ID, features: List[Feature], su: List[float]):
         self.featureRepo.save(features)
 
-#   def _calJamFactorDuration(self, id:ID, ) -> float:
+    def calJamFactorDuration(self, id:ID) -> float:
+        jamFactorDuration = 0
+        apiInput: APIInput = self.APIInputs[id]
+        queryOption: QueryOption = QueryOption()
+        queryOption.setOption(QueryOption.Latest, "true")
+        latestDataSet: DataSetDTO = self.featureRepo.find(id, queryOption)[0]
+        currentDate = self._praseRFCtimeToDatetime(apiInput.DateTime)
+        latestDate = self._praseRFCtimeToDatetime(latestDataSet.TimeStamp)
+
+        if self._getMinuteDelta(currentDate, latestDate) <= 10:
+            if self._isJamFactorExceedThreshold(latestDataSet.JamFactor, apiInput.JamFactor):
+                jamFactorDuration = 0
+            else:
+                jamFactorDuration = self._getMinuteDelta(currentDate, latestDate) + latestDataSet.JamFactorDuration
+        else:
+            jamFactorDuration = None
+
+        return jamFactorDuration
+
+    def _praseRFCtimeToDatetime(self, dateStr: str) -> datetime:
+        
+    
+        # dateStr = "21 June, 2018"
+        # 2021-05-09T05:56:31Z
+        # %Y-%d-%mT%H:%M:%SZ
+        date_object = datetime.strptime(dateStr, "%Y-%d-%mT%H:%M:%SZ")
+        return date_object
+
+    def _getMinuteDelta(self, currentTime: datetime, prevTime: datetime) -> int:
+        return (currentTime - prevTime).total_seconds() / 60
+
+    def _isJamFactorExceedThreshold(self, prevJF, currentJF) -> bool:
+        prevJFState = int(prevJF)
+        upperBound = prevJFState + 1.15
+        lowerBound = prevJFState - .15
+        return currentJF > upperBound or currentJF < lowerBound
 
 #   def _calDeltaJamFactor(self, id:ID, ) -> float:
 

@@ -16,11 +16,24 @@ class DataSetDTO:
     TimeStamp: str
     SpeedUncut: float
 
+    def timestamp(self, timestamp: str) -> 'DataSetDTO':
+        self.TimeStamp = timestamp
+        return self
+
+    def jamFactorDuration(self, jamfactorDuration: int) -> 'DataSetDTO':
+        self.JamFactorDuration = jamfactorDuration
+        return self
+
+    def jamFactor(self, jamFactor: float) -> 'DataSetDTO':
+        self.JamFactor = jamFactor
+        return self
+
+
 def createDatasetDAO(db: Database, orm: orm, RoadSegmentDAO):
     class DataSet(db.Entity):
         _table_ = 'DataSet'
         DataID: int = orm.PrimaryKey(int, auto=True)
-        RoadSegment = orm.Required(RoadSegmentDAO, reverse = 'HasFeatures')
+        RoadSegment = orm.Required(RoadSegmentDAO, reverse = 'Features')
         DayOfWeek: int = orm.Required(int)
         Day: int = orm.Required(int)
         Hour: int = orm.Required(int)

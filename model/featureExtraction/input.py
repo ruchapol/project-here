@@ -17,3 +17,7 @@ class APIInput:
     def jamFactor(self,jf: float) -> APIInput:
         self.JamFactor = jf
         return self
+
+    def dateTime(self, time: str) -> APIInput:
+        self.DateTime = time
+        return self
