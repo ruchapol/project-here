@@ -27,11 +27,13 @@ class FeatureExtraction(IFeatureExtraction):
         self.featureRepo.save(features)
 
     def calJamFactorDuration(self, id:ID) -> float:
-        jamFactorDuration = 0
+        jamFactorDuration = None
         apiInput: APIInput = self.APIInputs[id]
         queryOption: QueryOption = QueryOption()
         queryOption.setOption(QueryOption.Latest, "true")
         latestDataSet: DataSetDTO = self.featureRepo.find(id, queryOption)[0]
+        if latestDataSet is None:
+            return jamFactorDuration
         currentDate = self._praseRFCtimeToDatetime(apiInput.DateTime)
         latestDate = self._praseRFCtimeToDatetime(latestDataSet.TimeStamp)
 
@@ -40,14 +42,10 @@ class FeatureExtraction(IFeatureExtraction):
                 jamFactorDuration = 0
             else:
                 jamFactorDuration = self._getMinuteDelta(currentDate, latestDate) + latestDataSet.JamFactorDuration
-        else:
-            jamFactorDuration = None
 
         return jamFactorDuration
 
     def _praseRFCtimeToDatetime(self, dateStr: str) -> datetime:
-        
-    
         # dateStr = "21 June, 2018"
         # 2021-05-09T05:56:31Z
         # %Y-%d-%mT%H:%M:%SZ

@@ -9,9 +9,13 @@ class DataSetRepoMock(IRepository):
         self.data = data
 
     def find(self,id: ID, options: QueryOption):
+        if id not in self.data:
+            return [None]
         if options.wantLastest(): # sorted with dsc 
             return self.data[id][:1]
         return self.data[id]
+
+        
     
     def findAll(self):
         return [self.data]

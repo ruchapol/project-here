@@ -120,6 +120,21 @@ class TestFeatureExtraction(unittest.TestCase):
         # assertion
         self.assertEqual(jamFactorDuration, 0)
 
+    def test_calJamFactorDuration_emptyRepo(self):
+        # prepare data
+        apiInputs: Dict[ID, APIInput] = self._prepareAPIInput_for_calJamFactorDuration(2.5, "2021-05-09T05:59:31Z")
+        nodes = self._createABCNodes()
+        graph: IGraph = GraphMock(nodes)
+        self.featureExtraction = FeatureExtraction(
+            apiInputs, DataSetRepoMock({}), graph)
+
+        # execute
+        jamFactorDuration = self.featureExtraction.calJamFactorDuration(
+            ID("B", "B1"))
+
+        # assertion
+        self.assertEqual(jamFactorDuration, None)
+
     def test_calDeltaJamFactor(self):
         pass
 
