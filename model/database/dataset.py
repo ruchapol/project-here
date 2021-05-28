@@ -1,6 +1,7 @@
 from pony import orm
 from pony.orm.core import Database
 from model.ID import ID
+import json
 
 class DataSetDTO:
     ID: ID
@@ -16,17 +17,21 @@ class DataSetDTO:
     TimeStamp: str
     SpeedUncut: float
 
-    def timestamp(self, timestamp: str) -> 'DataSetDTO':
+    def setTimestamp(self, timestamp: str) -> 'DataSetDTO':
         self.TimeStamp = timestamp
         return self
 
-    def jamFactorDuration(self, jamfactorDuration: int) -> 'DataSetDTO':
+    def setJamFactorDuration(self, jamfactorDuration: int) -> 'DataSetDTO':
         self.JamFactorDuration = jamfactorDuration
         return self
 
-    def jamFactor(self, jamFactor: float) -> 'DataSetDTO':
+    def setJamFactor(self, jamFactor: float) -> 'DataSetDTO':
         self.JamFactor = jamFactor
         return self
+
+    def toJSON(self):
+        return json.dumps(self, default=lambda o: o.__dict__, 
+            sort_keys=True, indent=4)
 
 
 def createDatasetDAO(db: Database, orm: orm, RoadSegmentDAO):
@@ -39,10 +44,10 @@ def createDatasetDAO(db: Database, orm: orm, RoadSegmentDAO):
         Hour: int = orm.Required(int)
         Minute: int = orm.Required(int)
         JamFactor: float = orm.Required(float)
-        JamFactorDuration: int = orm.Required(int)
-        DeltaJamFactor: int = orm.Required(int)
-        NeightbourJamFactor: float = orm.Required(float)
-        NeightbourJamFactorDuration: int = orm.Required(int)
+        JamFactorDuration: int = orm.Optional(int)
+        DeltaJamFactor: int = orm.Optional(int)
+        NeightbourJamFactor: float = orm.Optional(float)
+        NeightbourJamFactorDuration: int = orm.Optional(int)
         TimeStamp: str = orm.Required(str)
         SpeedUncut: float = orm.Required(float)
     return DataSet

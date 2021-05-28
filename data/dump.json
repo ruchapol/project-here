@@ -1,0 +1,160 @@
+{
+    "Day": 5,
+    "DayOfWeek": 6,
+    "DeltaJamFactor": null,
+    "Hour": 5,
+    "ID": [
+        "219+00567",
+        "41003"
+    ],
+    "JamFactor": 0.0,
+    "JamFactorDuration": null,
+    "Minute": 56,
+    "NeightbourJamFactor": 0.0,
+    "NeightbourJamFactorDuration": null,
+    "SpeedUncut": 41.61,
+}
+{
+    "Day": 5,
+    "DayOfWeek": 6,
+    "DeltaJamFactor": null,
+    "Hour": 5,
+    "ID": [
+        "219+00567",
+        "41004"
+    ],
+    "JamFactor": 0.0,
+    "JamFactorDuration": null,
+    "Minute": 56,
+    "NeightbourJamFactor": 0.095655,
+    "NeightbourJamFactorDuration": null,
+    "SpeedUncut": 41.46,
+    "TimeStamp": "2021-05-09T05:56:31Z"
+}
+{
+    "Day": 5,
+    "DayOfWeek": 6,
+    "DeltaJamFactor": null,
+    "Hour": 5,
+    "ID": [
+        "219+00567",
+        "41005"
+    ],
+    "JamFactor": 0.19131,
+    "JamFactorDuration": null,
+    "Minute": 56,
+    "NeightbourJamFactor": 0.08664,
+    "NeightbourJamFactorDuration": null,
+    "SpeedUncut": 28.68,
+{
+    "Day": 5,
+    "DayOfWeek": 6,
+    "DeltaJamFactor": null,
+    "Hour": 5,
+    "ID": [
+        "219+00567",
+        "41006"
+    ],
+    "JamFactor": 0.17328,
+    "JamFactorDuration": null,
+    "Minute": 56,
+    "NeightbourJamFactor": 2.8818349999999997,
+    "NeightbourJamFactorDuration": null,
+    "SpeedUncut": 34.05,
+    "TimeStamp": "2021-05-09T05:56:31Z"
+}
+{
+    "Day": 5,
+    "DayOfWeek": 6,
+    "DeltaJamFactor": null,
+    "Hour": 5,
+    "ID": [
+        "219+00567",
+        "41007"
+    ],
+    "JamFactor": 5.57236,
+    "JamFactorDuration": null,
+    "Minute": 56,
+    "NeightbourJamFactor": 0.17328,
+    "NeightbourJamFactorDuration": null,
+    "SpeedUncut": 13.21,
+    "TimeStamp": "2021-05-09T05:56:31Z"
+}
+{
+    "Day": 5,
+    "DayOfWeek": 6,
+    "DeltaJamFactor": null,
+    "Hour": 5,
+    "ID": [
+        "219-00567",
+        "41007"
+    ],
+    "JamFactor": 0.891,
+    "JamFactorDuration": null,
+    "Minute": 56,
+    "NeightbourJamFactor": 0.9260999999999999,
+    "NeightbourJamFactorDuration": null,
+    "SpeedUncut": 27.06,
+{
+    "Day": 5,
+    "DayOfWeek": 6,
+    "DeltaJamFactor": null,
+    "Hour": 5,
+    "ID": [
+        "219-00567",
+        "41006"
+    ],
+    "JamFactor": 1.64976,
+    "JamFactorDuration": null,
+    "Minute": 56,
+    "NeightbourJamFactor": 0.4455,
+    "NeightbourJamFactorDuration": null,
+    "SpeedUncut": 26.06,
+    "TimeStamp": "2021-05-09T05:56:31Z"
+}
+{
+    "Day": 5,
+    "DayOfWeek": 6,
+    "DeltaJamFactor": null,
+    "Hour": 5,
+    "ID": [
+        "219-00567",
+        "41005"
+    ],
+    "JamFactor": 0.0,
+    "JamFactorDuration": null,
+    "Minute": 56,
+    "NeightbourJamFactor": 0.82488,
+    "NeightbourJamFactorDuration": null,
+    "SpeedUncut": 36.49,
+{
+    "Day": 5,
+    "DayOfWeek": 6,
+    "DeltaJamFactor": null,
+    "Hour": 5,
+    "ID": [
+        "219-00567",
+        "41004"
+    ],
+    "JamFactor": 0.0,
+    "JamFactorDuration": null,
+    "Minute": 56,
+    "NeightbourJamFactor": 0.0,
+    "NeightbourJamFactorDuration": null,
+    "SpeedUncut": 31.36,
+    "TimeStamp": "2021-05-09T05:56:31Z"
+}
+{
+    "Hour": 5,
+    "ID": [
+        "219-00567",
+        "41003"
+    ],
+    "JamFactor": 0.0,
+    "JamFactorDuration": null,
+    "Minute": 56,
+    "NeightbourJamFactor": 0.033765,
+    "NeightbourJamFactorDuration": null,
+    "SpeedUncut": 39.67,
+    "TimeStamp": "2021-05-09T05:56:31Z"
+}

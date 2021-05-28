@@ -8,6 +8,7 @@ from script.xml_read import TfXmlPraser
 from typing import List, Dict
 from utils.path import getPath
 from model.ID import ID
+from datetime import datetime
 
 jsonPATH = [".","data","data.json"]
 xmlPATH = [".","data","data.xml"]
@@ -20,6 +21,16 @@ def writeFileJSON():
     # Parse JSON into an object with attributes corresponding to dict keys.
     print(data)
     with open('data.json', 'w', encoding='utf-8') as f_out:
+        f_out.write(data)
+
+def writeFileXML():
+    parameters = {"app_id": "wwcWhGYZ5l7CgKOMisYT", "app_code": "IdjdLPBAG-tfDKm2J35YxA",
+                "bbox": "13.84999,100.49544;13.804780,100.532379"}
+    response = requests.get("http://traffic.cit.api.here.com/traffic/6.3/flow.xml", params=parameters)
+    data = response.content.decode('utf-8')
+    # Parse JSON into an object with attributes corresponding to dict keys.
+    # print(data)
+    with open(f'data{datetime.now().strftime("%Y%d%m_%H%M%S")}.xml', 'w', encoding='utf-8') as f_out:
         f_out.write(data)
 
 def decoder(hereApiDict):
@@ -36,7 +47,7 @@ def runJSON():
     print(y.RWS[0].RW[0].FIS[0].FI[0].CF[0].CN)
 
 
-def runXML(xmlPATH: List[str]) -> List[APIInput]:
+def runXML(xmlPATH: List[str]) -> Dict[ID, APIInput]:
     xmlPraser = TfXmlPraser()
     tf_dict = xmlPraser.parseFile(getPath(xmlPATH))
     # convert to Feature Input
@@ -49,8 +60,8 @@ def runXML(xmlPATH: List[str]) -> List[APIInput]:
         newInput.SegmentID = pc
         newID = ID(li, pc)
         newInput.DateTime = currentData['datetime']
-        newInput.SpeedUncut = currentData['su']
-        newInput.JamFactor = currentData['jf']
+        newInput.SpeedUncut = float(currentData['su'])
+        newInput.JamFactor = float(currentData['jf'])
         newInput.Confident = currentData['confident']
         apiInputs[newID] = newInput
     return apiInputs
