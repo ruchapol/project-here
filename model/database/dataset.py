@@ -47,7 +47,7 @@ def createDatasetDAO(db: Database, orm: orm, RoadSegmentDAO):
         JamFactorDuration: int = orm.Optional(int)
         DeltaJamFactor: int = orm.Optional(int)
         NeightbourJamFactor: float = orm.Optional(float)
-        NeightbourJamFactorDuration: int = orm.Optional(int)
-        TimeStamp: str = orm.Required(str)
+        NeightbourJamFactorDuration: int = orm.Optional(float)
+        TimeStamp: str = orm.Required(str, index=True)
         SpeedUncut: float = orm.Required(float)
     return DataSet

@@ -133,4 +133,3 @@ def migrate(db: orm.Database):
     # t=query(roadSegmentDAO)
     # for a in t:
     #     print(a.RoadID,a.RoadSegmentID, a.To)
-

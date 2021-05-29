@@ -1,64 +1,58 @@
-from pony.orm.core import db_session, desc, select
-from script.collector import runXML
-from typing import List
+from utils.path import getPath
+from model.ID import ID
+from model.featureExtraction.input import APIInput
+from typing import Dict
+from script.collector import getAPIInputsFromXML
 from pony import orm
-from script.migrateTable import migrate
 from graph.graph import Graph
 from repository.roadSegment import RoadSegmentRepo
 from repository.dataSet import DataSetRepo
 from repository.dataSet_mock import DataSetRepoMock
 from model.database.roadSegment import createRoadSegmentDAO, createOutboundDAO
 from model.database.dataset import createDatasetDAO
-from featureExtraction.featureExtraction import FeatureExtraction
+from featureExtraction.featureExtraction import FeatureExtraction, timerBenchmark
 from script.collector import writeFileXML
-
-@db_session
-def query(roadSegmentDAO):
-    t = roadSegmentDAO["219-00566","40504"]
-    for f in t.Features:
-        print(f.SpeedUncut)
-
-@db_session
-def queryWithRoadSegment(roadSegmentDAO):
-    features = select(x for x in roadSegmentDAO["219-00566","405045"].Features).order_by(lambda: desc(x.TimeStamp))
-    print("features = ",features)
-    for f in features:
-        print(f.SpeedUncut)
+from os import listdir
+from os.path import isfile, join
+from tqdm import tqdm
 
 
-@db_session
-def queryDataset(datasetDAO):
-    sorted_t = select(x for x in datasetDAO).order_by(lambda: desc(x.TimeStamp))
-    for f in sorted_t:
-        print(f.SpeedUncut)
-        break
+def runExtraction(db: orm.Database):
+    roadsegmentDAO = createRoadSegmentDAO(db, orm)
+    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
+    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
+    db.generate_mapping(create_tables=True)
+    # create repo
+    roadsegmentRepo = RoadSegmentRepo(roadsegmentDAO, outboundDAO)
+    datasetRepo = DataSetRepo(roadsegmentDAO, datasetDAO)
+
+    # create graph
+    graph = Graph(roadsegmentRepo)
+    featureExtraction:FeatureExtraction = FeatureExtraction({}, datasetRepo, graph)
+    # apiInputs = getAPIInputsFromXML([".","data","data20212905_013807.xml"])
+    # data = featureExtraction.processInput(apiInputs)
+    # featureExtraction.saveToDB(data)
+
+
+    tfPath = getPath([".","data2month_current"])
+    for day in tqdm(listdir(tfPath)):
+        for hour in tqdm(listdir(join(tfPath, day))):
+            for minute in listdir(join(tfPath, day, hour)):
+                xmlPath = join(tfPath, day, hour, minute)
+                apiInputs: Dict[ID, APIInput] = getAPIInputsFromXML(xmlPath)
+                featureExtraction.setAPIInputs(apiInputs)
+                datasets = featureExtraction.processInput()
+                featureExtraction.saveToDB(datasets)
+    print(timerBenchmark)
+
 
 if __name__ == '__main__':
     # writeFileXML()
 
     db = orm.Database()
     db.bind(provider='sqlite', filename='database.db', create_db=True)
-    roadSegmentDAO = createRoadSegmentDAO(db, orm)
-    outboundDAO = createOutboundDAO(db, orm, roadSegmentDAO)
-    datasetDAO = createDatasetDAO(db, orm, roadSegmentDAO)
-    db.generate_mapping(create_tables=True)
-    apiInputs = runXML([".","data","data20212905_013807.xml"])
-    # create repo
-    roadSegmentRepo = RoadSegmentRepo(roadSegmentDAO, outboundDAO)
-    datasetRepo = DataSetRepo(roadSegmentDAO, datasetDAO)
-    datasetRepoMock = DataSetRepoMock({})
+    runExtraction(db)
 
-    # create graph
-    graph = Graph(roadSegmentRepo)
-    featureExtraction:FeatureExtraction = FeatureExtraction(apiInputs, datasetRepo, graph)
-    data = featureExtraction.processInput()
-    featureExtraction.saveToDB(data)
-
-
-
-    # migrate(db)
-    # queryWithRoadSegment(roadSegmentDAO)
-    # queryDataset(datasetDAO)
 
 
 

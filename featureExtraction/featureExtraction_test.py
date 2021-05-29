@@ -98,6 +98,26 @@ class TestFeatureExtraction(unittest.TestCase):
 
         # assertion
         self.assertEqual(jamFactorDuration, 13)
+
+    def test_calJamFactorDuration_case1(self):
+        # prepare data
+        apiInputs: Dict[ID, APIInput] = self._prepareAPIInput_for_calJamFactorDuration(3.11643, "2019-03-31T18:29:19Z")
+        nodes = self._createABCNodes()
+        graph: IGraph = GraphMock(nodes)
+        self.featureExtraction = FeatureExtraction(
+            apiInputs, DataSetRepoMock({
+            ID("B", "B1"): [
+                DataSetDTO().setTimestamp("2019-03-31T18:24:18Z").setJamFactorDuration(0).setJamFactor(3.11643),
+                DataSetDTO().setTimestamp("2019-03-09T05:47:31Z").setJamFactorDuration(20)
+            ]
+        }), graph)
+
+        # execute
+        jamFactorDuration = self.featureExtraction.calJamFactorDuration(
+            ID("B", "B1"))
+
+        # assertion
+        self.assertEqual(jamFactorDuration, 5)
     
     def test_calJamFactorDuration_timeExceed(self):
         # prepare data
@@ -263,6 +283,6 @@ class TestFeatureExtraction(unittest.TestCase):
         deltaJamFactor = self.featureExtraction.calNeightbourJamFactorDuration(ID("B", "B1"))
 
         # assertion
-        self.assertEqual(deltaJamFactor, 33)
+        self.assertEqual(deltaJamFactor, 16.5)
 
 

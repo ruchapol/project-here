@@ -47,9 +47,12 @@ def runJSON():
     print(y.RWS[0].RW[0].FIS[0].FI[0].CF[0].CN)
 
 
-def runXML(xmlPATH: List[str]) -> Dict[ID, APIInput]:
+def getAPIInputsFromXML(xmlPATH) -> Dict[ID, APIInput]:
     xmlPraser = TfXmlPraser()
-    tf_dict = xmlPraser.parseFile(getPath(xmlPATH))
+    xmlPathStr = xmlPATH
+    if isinstance(xmlPathStr, list):
+        xmlPathStr = getPath(xmlPathStr)
+    tf_dict = xmlPraser.parseFile(xmlPathStr)
     # convert to Feature Input
     apiInputs: Dict[ID,APIInput] = {}
     for li, pc in tf_dict:

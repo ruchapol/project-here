@@ -29,18 +29,22 @@ class QueryOption:
 
 class DataSetRepo(IRepository):
     datasetDAO = None
+    # cache: Dict[ID, DataSetDTO]
     def __init__(self, roadSegmentDAO, datasetDAO):
         self.datasetDAO = datasetDAO
         self.roadSegmentDAO = roadSegmentDAO
-
+        # self.cache = {}
 
     @db_session
     def find(self, id: ID, options: QueryOption) -> DataSetDTO:
         try:
             if options.wantLastest(): # sorted with dsc 
-                latest = select(x for x in self.roadSegmentDAO[id.RoadID,id.SegmentID].Features).order_by(lambda: desc(x.TimeStamp))
+                # if id in self.cache:
+                #     return self.cache[id][:1]
+                latest = select(x for x in self.roadSegmentDAO[id.RoadID,id.SegmentID].Features).order_by(lambda: desc(x.TimeStamp)).limit(1)
                 if len(latest) == 0:
                     return [None]
+                # self.cache[id] = latest
                 return latest[:1]
             return self.datasetDAO[id.RoadID,id.SegmentID]
         except ObjectNotFound:
@@ -52,7 +56,6 @@ class DataSetRepo(IRepository):
 
     @db_session
     def save(self, datasets: List[DataSetDTO]):
-        print("data len = ",len(datasets))
         for dataset in datasets:
             self.datasetDAO(
             RoadSegment = self.roadSegmentDAO[dataset.ID.RoadID, dataset.ID.SegmentID],

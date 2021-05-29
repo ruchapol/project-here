@@ -8,6 +8,33 @@ from model.featureExtraction.feature import Feature
 from typing import List, Tuple, Dict
 from repository.dataSet import QueryOption
 from datetime import datetime
+import time
+
+timerBenchmark = {}
+
+
+def timerfunc(func):
+    """
+    A timer decorator
+    """
+    def function_timer(*args, **kwargs):
+        """
+        A nested function for timing other functions
+        """
+        start = time.time()
+        value = func(*args, **kwargs)
+        end = time.time()
+        runtime = end - start
+        # msg = "{func} took {time} seconds to complete"
+        # print(msg.format(func=func.__name__,
+        #                  time=runtime))
+        if func.__name__ in timerBenchmark:
+            timerBenchmark[func.__name__] += runtime
+        else:
+            timerBenchmark[func.__name__] = runtime
+        return value
+    return function_timer
+
 
 class FeatureExtraction(IFeatureExtraction):
     APIInputs: Dict[ID, APIInput]
@@ -15,10 +42,19 @@ class FeatureExtraction(IFeatureExtraction):
     graph: IGraph
     jamFactorDuration: Dict[ID, float]
 
-    def __init__(self, data: Dict[ID, APIInput], repo: IRepository, graph: IGraph):
-        self.APIInputs = data
+    def __init__(self, apiInputs: Dict[ID, APIInput], repo: IRepository, graph: IGraph):
+        self.setAPIInputs(apiInputs)
         self.featureRepo = repo
         self.graph = graph
+        self.jamFactorDuration = {}
+
+    def setAPIInputs(self, apiInputs: Dict[ID, APIInput]):
+        if apiInputs is None:
+            raise Exception('none is not a valid apiInputs')
+        self.APIInputs = apiInputs
+        self.resetState()
+
+    def resetState(self):
         self.jamFactorDuration = {}
 
     def processInput(self) -> List[DataSetDTO]:
@@ -26,7 +62,7 @@ class FeatureExtraction(IFeatureExtraction):
         for id, apiInput in self.APIInputs.items():
             if self.graph.getNodeByID(id) is None:
                 continue
-            dataset: DataSetDTO = DataSetDTO() 
+            dataset: DataSetDTO = DataSetDTO()
             dataset.ID = id
             dataset.Day = apiInput.getDay()
             dataset.DayOfWeek = apiInput.getDayOfWeek()
@@ -36,7 +72,8 @@ class FeatureExtraction(IFeatureExtraction):
             dataset.JamFactor = apiInput.JamFactor
             dataset.JamFactorDuration = self.calJamFactorDuration(id)
             dataset.NeightbourJamFactor = self.calNeightbourJamFactor(id)
-            dataset.NeightbourJamFactorDuration = self.calNeightbourJamFactorDuration(id)
+            dataset.NeightbourJamFactorDuration = self.calNeightbourJamFactorDuration(
+                id)
             dataset.SpeedUncut = apiInput.SpeedUncut
             dataset.TimeStamp = apiInput.DateTime
             datasets.append(dataset)
@@ -45,7 +82,8 @@ class FeatureExtraction(IFeatureExtraction):
     def saveToDB(self, dataSet: List[DataSetDTO]):
         self.featureRepo.save(dataSet)
 
-    def calJamFactorDuration(self, id:ID) -> float:
+    @timerfunc
+    def calJamFactorDuration(self, id: ID) -> int:
         if id in self.jamFactorDuration:
             return self.jamFactorDuration[id]
         if id not in self.APIInputs:
@@ -55,21 +93,24 @@ class FeatureExtraction(IFeatureExtraction):
         queryOption: QueryOption = QueryOption()
         queryOption.setOption(QueryOption.Latest, "true")
         latestDataSet: DataSetDTO = self.featureRepo.find(id, queryOption)[0]
-        if latestDataSet is None or latestDataSet.JamFactorDuration is None:
+        if latestDataSet is None:
             return None
-        currentDate = self._praseRFCtimeToDatetime(apiInput.DateTime)
-        latestDate = self._praseRFCtimeToDatetime(latestDataSet.TimeStamp)
+        currentDate = self._parseRFCtimeToDatetime(apiInput.DateTime)
+        latestDate = self._parseRFCtimeToDatetime(latestDataSet.TimeStamp)
 
         jamFactorDuration = None
         if self._getMinuteDelta(currentDate, latestDate) <= 10:
             if self._isJamFactorExceedThreshold(latestDataSet.JamFactor, apiInput.JamFactor):
                 jamFactorDuration = 0
             else:
-                jamFactorDuration = self._getMinuteDelta(currentDate, latestDate) + latestDataSet.JamFactorDuration
+                if latestDataSet.JamFactorDuration is None:
+                    return None
+                jamFactorDuration = int(self._getMinuteDelta(
+                    currentDate, latestDate) + latestDataSet.JamFactorDuration)
         self.jamFactorDuration[id] = jamFactorDuration
         return jamFactorDuration
 
-    def _praseRFCtimeToDatetime(self, dateStr: str) -> datetime:
+    def _parseRFCtimeToDatetime(self, dateStr: str) -> datetime:
         # dateStr = "21 June, 2018"
         # 2021-05-09T05:56:31Z
         # %Y-%d-%mT%H:%M:%SZ
@@ -77,7 +118,7 @@ class FeatureExtraction(IFeatureExtraction):
         return date_object
 
     def _getMinuteDelta(self, currentTime: datetime, prevTime: datetime) -> int:
-        return (currentTime - prevTime).total_seconds() / 60
+        return (currentTime - prevTime).total_seconds() // 60
 
     def _isJamFactorExceedThreshold(self, prevJF, currentJF) -> bool:
         prevJFState = int(prevJF)
@@ -85,7 +126,8 @@ class FeatureExtraction(IFeatureExtraction):
         lowerBound = prevJFState - .15
         return currentJF > upperBound or currentJF < lowerBound
 
-    def calDeltaJamFactor(self, id:ID, ) -> float:
+    @timerfunc
+    def calDeltaJamFactor(self, id: ID, ) -> int:
         apiInput: APIInput = self.APIInputs[id]
         queryOption: QueryOption = QueryOption()
         queryOption.setOption(QueryOption.Latest, "true")
@@ -94,10 +136,10 @@ class FeatureExtraction(IFeatureExtraction):
             return None
         currentJF = apiInput.JamFactor
         prevJF = latestDataSet.JamFactor
-        return currentJF - prevJF
+        return int(currentJF - prevJF)
 
-
-    def calNeightbourJamFactor(self, id:ID) -> float:
+    @timerfunc
+    def calNeightbourJamFactor(self, id: ID) -> float:
         v = 0
         node = self.graph.getNodeByID(id)
         if node is None:
@@ -112,7 +154,8 @@ class FeatureExtraction(IFeatureExtraction):
             return None
         return v / countValidNeighbour
 
-    def calNeightbourJamFactorDuration(self, id:ID) -> float:
+    @timerfunc
+    def calNeightbourJamFactorDuration(self, id: ID) -> float:
         v = 0
         node = self.graph.getNodeByID(id)
         if node is None:
@@ -127,7 +170,6 @@ class FeatureExtraction(IFeatureExtraction):
         if countValidNeighbour == 0:
             return None
         return v / countValidNeighbour
-
 
     # DayOfWeek: int
     # Day: int
