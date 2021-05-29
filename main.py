@@ -1,3 +1,4 @@
+from predictionModel.predictionModelRunner import PredictionModelRunner
 from utils.path import getPath
 from model.ID import ID
 from model.featureExtraction.input import APIInput
@@ -15,7 +16,7 @@ from script.collector import writeFileXML
 from os import listdir
 from os.path import isfile, join
 from tqdm import tqdm
-
+from predictionModel.predictionModel_v1 import PredictionModelV1
 
 def runExtraction(db: orm.Database):
     roadsegmentDAO = createRoadSegmentDAO(db, orm)
@@ -45,13 +46,27 @@ def runExtraction(db: orm.Database):
                 featureExtraction.saveToDB(datasets)
     print(timerBenchmark)
 
+def runTrainModel():
+    roadsegmentDAO = createRoadSegmentDAO(db, orm)
+    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
+    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
+    db.generate_mapping(create_tables=True)
+    # create repo
+    roadsegmentRepo = RoadSegmentRepo(roadsegmentDAO, outboundDAO)
+    datasetRepo = DataSetRepo(roadsegmentDAO, datasetDAO)
+    # prepare Model
+    predictionModel = PredictionModelV1()
+
+    predictionModelRunner = PredictionModelRunner(roadsegmentRepo, datasetRepo, predictionModel)
+    predictionModelRunner.train()
 
 if __name__ == '__main__':
     # writeFileXML()
 
     db = orm.Database()
     db.bind(provider='sqlite', filename='database.db', create_db=True)
-    runExtraction(db)
+    # runExtraction(db)
+    runTrainModel()
 
 
 

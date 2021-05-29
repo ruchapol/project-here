@@ -38,13 +38,13 @@ def timerfunc(func):
 
 class FeatureExtraction(IFeatureExtraction):
     APIInputs: Dict[ID, APIInput]
-    featureRepo: IRepository
+    datasetRepo: IRepository
     graph: IGraph
     jamFactorDuration: Dict[ID, float]
 
     def __init__(self, apiInputs: Dict[ID, APIInput], repo: IRepository, graph: IGraph):
         self.setAPIInputs(apiInputs)
-        self.featureRepo = repo
+        self.datasetRepo = repo
         self.graph = graph
         self.jamFactorDuration = {}
 
@@ -80,7 +80,7 @@ class FeatureExtraction(IFeatureExtraction):
         return datasets
 
     def saveToDB(self, dataSet: List[DataSetDTO]):
-        self.featureRepo.save(dataSet)
+        self.datasetRepo.save(dataSet)
 
     @timerfunc
     def calJamFactorDuration(self, id: ID) -> int:
@@ -92,7 +92,7 @@ class FeatureExtraction(IFeatureExtraction):
         apiInput: APIInput = self.APIInputs[id]
         queryOption: QueryOption = QueryOption()
         queryOption.setOption(QueryOption.Latest, "true")
-        latestDataSet: DataSetDTO = self.featureRepo.find(id, queryOption)[0]
+        latestDataSet: DataSetDTO = self.datasetRepo.find(id, queryOption)[0]
         if latestDataSet is None:
             return None
         currentDate = self._parseRFCtimeToDatetime(apiInput.DateTime)
@@ -131,7 +131,7 @@ class FeatureExtraction(IFeatureExtraction):
         apiInput: APIInput = self.APIInputs[id]
         queryOption: QueryOption = QueryOption()
         queryOption.setOption(QueryOption.Latest, "true")
-        latestDataSet: DataSetDTO = self.featureRepo.find(id, queryOption)[0]
+        latestDataSet: DataSetDTO = self.datasetRepo.find(id, queryOption)[0]
         if latestDataSet is None:
             return None
         currentJF = apiInput.JamFactor

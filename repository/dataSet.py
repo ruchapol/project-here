@@ -2,21 +2,23 @@ from re import L
 from typing import Dict, List
 from interface.repository import IRepository
 from pony.orm import db_session, select, get, desc
-from pony.orm.core import ObjectNotFound
+from pony.orm.core import OrmError
 from pony import orm
 from model.database.dataset import DataSetDTO
 from model.ID import ID
+
 
 class QueryOption:
     Latest: str = 'latest'
     Limit: str = 'limit'
     queryOption: Dict
-    def __init__(self):
-        self.queryOption = {}
 
-    def setOption(self, key:str, value:str):
+    def __init__(self):
+        self.queryOption = {self.Latest: "false"}
+
+    def setOption(self, key: str, value: str):
         self.queryOption[key] = value
-        
+
     def wantLastest(self) -> bool:
         return self.queryOption[QueryOption.Latest] == "true"
 
@@ -27,29 +29,53 @@ class QueryOption:
         else:
             return limit
 
+
 class DataSetRepo(IRepository):
     datasetDAO = None
     # cache: Dict[ID, DataSetDTO]
+
     def __init__(self, roadSegmentDAO, datasetDAO):
         self.datasetDAO = datasetDAO
         self.roadSegmentDAO = roadSegmentDAO
         # self.cache = {}
 
     @db_session
-    def find(self, id: ID, options: QueryOption) -> DataSetDTO:
+    def find(self, id: ID, options: QueryOption = QueryOption()) -> DataSetDTO:
         try:
-            if options.wantLastest(): # sorted with dsc 
+            if options.wantLastest():  # sorted with dsc
                 # if id in self.cache:
                 #     return self.cache[id][:1]
-                latest = select(x for x in self.roadSegmentDAO[id.RoadID,id.SegmentID].Features).order_by(lambda: desc(x.TimeStamp)).limit(1)
-                if len(latest) == 0:
+                latestDataset = select(x for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features).order_by(
+                    lambda: desc(x.TimeStamp)).limit(1)
+                if len(latestDataset) == 0:
                     return [None]
                 # self.cache[id] = latest
-                return latest[:1]
-            return self.datasetDAO[id.RoadID,id.SegmentID]
-        except ObjectNotFound:
+                return latestDataset
+            datasetsDAO = select(x for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
+            datasetsDTO: List[DataSetDTO] = []
+            for dataset in datasetsDAO:
+                datasetsDTO.append(self._datasetDAOToDTO(ID, dataset))
+            return datasetsDTO
+        except OrmError as e:
+            print("OrmError:",e)
             return [None]
-        
+
+    def _datasetDAOToDTO(self, id:ID, dataSetDAO) -> DataSetDTO:
+        d = DataSetDTO()
+        d.ID = id
+        d.DayOfWeek = dataSetDAO.DayOfWeek
+        d.Day = dataSetDAO.Day
+        d.Hour = dataSetDAO.Hour
+        d.Minute = dataSetDAO.Minute
+        d.JamFactor = dataSetDAO.JamFactor
+        d.JamFactorDuration = dataSetDAO.JamFactorDuration
+        d.DeltaJamFactor = dataSetDAO.DeltaJamFactor
+        d.NeightbourJamFactor = dataSetDAO.NeightbourJamFactor
+        d.NeightbourJamFactorDuration = dataSetDAO.NeightbourJamFactorDuration
+        d.TimeStamp = dataSetDAO.TimeStamp
+        d.SpeedUncut = dataSetDAO.SpeedUncut
+        return d
+
     @db_session
     def findAll(self) -> Dict[ID, DataSetDTO]:
         pass
@@ -58,16 +84,17 @@ class DataSetRepo(IRepository):
     def save(self, datasets: List[DataSetDTO]):
         for dataset in datasets:
             self.datasetDAO(
-            RoadSegment = self.roadSegmentDAO[dataset.ID.RoadID, dataset.ID.SegmentID],
-            DayOfWeek = dataset.DayOfWeek,
-            Day = dataset.Day,
-            Hour = dataset.Hour,
-            Minute = dataset.Minute,
-            JamFactor = dataset.JamFactor,
-            JamFactorDuration = dataset.JamFactorDuration,
-            DeltaJamFactor = dataset.DeltaJamFactor,
-            NeightbourJamFactor = dataset.NeightbourJamFactor,
-            NeightbourJamFactorDuration = dataset.NeightbourJamFactorDuration,
-            TimeStamp = dataset.TimeStamp,
-            SpeedUncut = dataset.SpeedUncut,
+                RoadSegment=self.roadSegmentDAO[dataset.ID.RoadID,
+                                                dataset.ID.SegmentID],
+                DayOfWeek=dataset.DayOfWeek,
+                Day=dataset.Day,
+                Hour=dataset.Hour,
+                Minute=dataset.Minute,
+                JamFactor=dataset.JamFactor,
+                JamFactorDuration=dataset.JamFactorDuration,
+                DeltaJamFactor=dataset.DeltaJamFactor,
+                NeightbourJamFactor=dataset.NeightbourJamFactor,
+                NeightbourJamFactorDuration=dataset.NeightbourJamFactorDuration,
+                TimeStamp=dataset.TimeStamp,
+                SpeedUncut=dataset.SpeedUncut,
             )
