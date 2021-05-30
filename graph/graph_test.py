@@ -2,6 +2,7 @@ from interface.graph import IGraph, INode
 from graph.graph import Graph, Node
 from model.ID import ID
 from typing import List
+from repository.roadSegment_mock import RoadSegmentRepoMock
 import unittest
 
 
@@ -9,7 +10,7 @@ class TestGraph(unittest.TestCase):
     graph: IGraph
 
     def setUp(self):
-        graph = Graph()
+        graph = Graph(RoadSegmentRepoMock({}))
         node1 = Node(ID("roadA", "segmentA"), "ROAD A", "segmentA")
         node2 = Node(ID("roadA", "segmentB"), "ROAD A", "segmentB")
         node3 = Node(ID("roadZ", "segmentC"), "ROAD Z", "segmentC")

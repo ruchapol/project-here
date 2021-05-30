@@ -6,6 +6,7 @@ from typing import Dict, List, Tuple
 from interface.repository import IRepository
 from interface.predictionModel import IPredictionModel
 import statistics
+from utils.date import parseRFCtimeToDatetime
 
 class PredictionModelRunner:
     roadSegmentRepo: IRepository
@@ -62,7 +63,7 @@ class PredictionModelRunner:
             x.append(dataset.NeightbourJamFactorDuration)
             xy[0].append(x)
             xy[1].append(dataset.SpeedUncut)
-            xy[2].append(dataset.TimeStamp)
+            xy[2].append(parseRFCtimeToDatetime(dataset.TimeStamp))
         return xy    
 
     def saveToDB(self):
