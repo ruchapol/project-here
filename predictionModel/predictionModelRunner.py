@@ -22,6 +22,10 @@ class PredictionModelRunner:
         roadSegments: Dict[ID, RoadSegmentDTO] = self.roadSegmentRepo.findAll()
         c = 0
         for roadId in roadSegments:
+            c+=1
+            if c==1:
+                continue
+
             print(roadId)
             datasets: List[DataSetDTO] = self.datasetRepo.find(roadId)
             (x,y,t) = self._dataSetDTOListToXY(datasets)
@@ -30,7 +34,7 @@ class PredictionModelRunner:
                 continue
             self.predictionModel.train(x, y, t)
             print(self.predictionModel.predict(x[:1]))
-            c+=1
+
             if c==2:
                 break
 

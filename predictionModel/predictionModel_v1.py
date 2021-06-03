@@ -45,6 +45,17 @@ class PredictionModelV1(IPredictionModel):
             else:
                 newY.append(y[currentIdx])
         return newY
+    
+    def removeByNoneInY(self, x:List[float], y:List[float]) -> Tuple[List[float],List[float]]:
+        if len(x) != len(y):
+            raise Exception("len y is not equal to x")
+        newX = []
+        newY = []
+        for index, itemY in enumerate(y):
+            if itemY is not None:
+                newX.append(x[index])
+                newY.append(itemY)
+        return (newX,newY)
 
     # def shiftYByTime(self, y:List[float], timeStamp: List[datetime], minuteAhead: str) -> List[float]:
     #     shiftAmount = self.getShiftAmount(minuteAhead)
@@ -69,8 +80,11 @@ class PredictionModelV1(IPredictionModel):
         np_x = np.array(x)
         self.numOfFeatures = np_x.shape[1]
         for minuteAhead, linearRegression in self.linearRegression.items():
-            y = self._shiftYByTime(y, timeStamp, minuteAhead)
-            linearRegression.fit(np_x, y)
+            newY = self.shiftYByTime(y, timeStamp, minuteAhead)
+            newX, newY = self.removeByNoneInY(x, newY)
+            if len(newX) == 0 or len(newY) == 0:
+                raise Exception("len x or len y is zero")
+            linearRegression.fit(newX, newY)
 
 
         # print(reg.score(X, y))

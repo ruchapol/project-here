@@ -108,6 +108,32 @@ class TestPredictionModelV1(unittest.TestCase):
         self.assertEqual(got, [7, 8, 9, 10, 11, 12, None, None, None, None, None, None])
     
 
+    def test_removeByNoneInY(self):
+        # prepare
+        x = [[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]]
+        y = [1, 2, None, 4, 5, 6, None, 8, 9, 10]
+
+        #execute
+        p = PredictionModelV1()
+        newX, newY = p.removeByNoneInY(x, y)
+
+        # assert
+        self.assertEqual(newX, [[1], [2], [4], [5], [6], [8], [9], [10]])
+        self.assertEqual(newY, [1, 2, 4, 5, 6, 8, 9, 10])
+
+    def test_removeByNoneInY_caseXY_is_numpy(self):
+        # prepare
+        x = np.array([[1], [2], [3], [4], [5], [6], [7], [8], [9], [10]])
+        y = np.array([1, 2, None, 4, 5, 6, None, 8, 9, 10])
+
+        #execute
+        p = PredictionModelV1()
+        newX, newY = p.removeByNoneInY(x, y)
+
+        # assert
+        self.assertTrue((newX == np.array([[1], [2], [4], [5], [6], [8], [9], [10]])).all())
+        self.assertTrue((newY == np.array([1, 2, 4, 5, 6, 8, 9, 10])).all())
+
     def test_shiftLeft(self):
         # prepare
         a = [1,2,3,4,5,6,7]
