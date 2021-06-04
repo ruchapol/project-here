@@ -1,3 +1,4 @@
+from script.migrateTable import migrate
 from predictionModel.predictionModelRunner import PredictionModelRunner
 from utils.path import getPath
 from model.ID import ID
@@ -66,7 +67,8 @@ if __name__ == '__main__':
     db = orm.Database()
     db.bind(provider='sqlite', filename='database.db', create_db=True)
     # runExtraction(db)
-    runTrainModel()
+    # runTrainModel()
+    migrate(db)
 
 
 

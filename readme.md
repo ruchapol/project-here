@@ -2,11 +2,14 @@
 
 * [X] รูปเล่ม
 * [X] ขั้นตอนการเอา collector ขึ้น gcloud
-* [ ] ขั้นตอนการทำ backend และการเอาขึ้น
-* [ ] graph
-* [ ] feature extraction
-* [ ] MODEL Train 
+* [x] ขั้นตอนการทำ backend และการเอาขึ้น
+* [x] graph
+* [x] feature extraction
+* [x] MODEL Train 
 * [ ] PREDICTION API
+    * [x] เอาข้อมูล distance ลง outbound
+    * [ ] คำนวณเวลาจาก SU ออกมา
+    * [ ] เอาเวลาที่คำนวณจากข้อบนมา sum กัน
 * [ ] BACKEND API
 * [ ] รูป Visualize
 

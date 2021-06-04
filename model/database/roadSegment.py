@@ -17,6 +17,7 @@ class OutboundDTO:
     OutboundID: int
     From: RoadSegmentDTO  # point to RowID
     To: RoadSegmentDTO  # point to RowID
+    Distance: float
 
 def createRoadSegmentDAO(db: Database, orm: orm):
     class RoadSegment(db.Entity):
@@ -40,5 +41,6 @@ def createOutboundDAO(db: Database, orm: orm, RoadSegmentDAO):
         OutboundID: int = orm.PrimaryKey(int, auto=True)
         From = orm.Required(RoadSegmentDAO, reverse = 'From')
         To = orm.Required(RoadSegmentDAO, reverse = 'To')
+        Distance = orm.Optional(float)
     return Outbound
 

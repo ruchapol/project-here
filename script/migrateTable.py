@@ -6,25 +6,29 @@ from model.database.dataset import *
 from pony.orm import db_session, select, get
 from typing import Dict, List
 from model.ID import ID
+from geopy.distance import geodesic
 import csv
 
 roadSegmentPath = [".", "data", "geo_with_ajacant.csv"]
 
-NONE = 'none'
+NONE_CONSTANT = 'none'
 NONE_SEGMENT_DICT = {
-    'RoadID': NONE,
-    'RoadSegmentID': NONE,
+    'RoadID': NONE_CONSTANT,
+    'RoadSegmentID': NONE_CONSTANT,
     'RoadDescription': 'Unknown Road',
     'SegmentDescription': 'Unknown Description',
-    'LatLong': NONE,
+    'LatLong': NONE_CONSTANT,
 }
 
 
 @db_session
-def createSegment(roadSegmentDAO, data: Dict):
+def createOrGetSegment(roadSegmentDAO, data: Dict):
     latlong = data["LatLong"]
     if not latlong:
-        latlong = NONE
+        latlong = NONE_CONSTANT
+    o = roadSegmentDAO.get(RoadID=data['RoadID'], RoadSegmentID=data['RoadSegmentID'])
+    if o:
+        return o
     r = roadSegmentDAO(RoadID=data['RoadID'], RoadSegmentID=data['RoadSegmentID'],
                        RoadDescription=data['RoadDescription'],
                        RoadSegmentDescription=data['SegmentDescription'], LatLong=latlong)
@@ -41,7 +45,12 @@ def createOutbound(roadSegmentDAO, outboundDAO):
 
 @db_session
 def addOutbound(o, a, b):
-    o(From=a, To=b)
+    if a.LatLong != NONE_CONSTANT and b.LatLong != NONE_CONSTANT:
+        (aLat, aLong) = a.LatLong.split(',')
+        (bLat, bLong) = b.LatLong.split(',')
+        o(From=a, To=b, Distance=geodesic((aLat, aLong), (bLat, bLong)).kilometers)
+    else:
+        o(From=a, To=b)
 
 
 @db_session
@@ -88,8 +97,8 @@ def countEmpty(*list: List[str]) -> int:
 
 @db_session
 def insert_database(roadSegmentDAO, outboundDAO):
-    noneLocation = createSegment(roadSegmentDAO, NONE_SEGMENT_DICT)
-    roadMap: Dict = {(NONE, NONE): noneLocation}
+    noneLocation = createOrGetSegment(roadSegmentDAO, NONE_SEGMENT_DICT)
+    roadMap: Dict = {(NONE_CONSTANT, NONE_CONSTANT): noneLocation}
     remainOutbound: Dict = {}
     with open(getPath(roadSegmentPath), encoding='utf-8-sig') as file:
         csv_file = csv.DictReader(file)
@@ -97,9 +106,9 @@ def insert_database(roadSegmentDAO, outboundDAO):
             currentRoad = (row['RoadID'], row['RoadSegmentID'])
             if currentRoad in roadMap:
                 continue
-            roadMap[currentRoad] = createSegment(roadSegmentDAO, row)
+            roadMap[currentRoad] = createOrGetSegment(roadSegmentDAO, row)
 
-            if currentRoad in remainOutbound:
+            if currentRoad in remainOutbound: # add outbound to added road
                 for from_s in remainOutbound[currentRoad]:
                     addOutbound(outboundDAO, from_s, roadMap[currentRoad])
 
@@ -108,18 +117,18 @@ def insert_database(roadSegmentDAO, outboundDAO):
                 pc = row['PC'+str(i)]
                 countEmptyColumn = countEmpty(outbound, pc)
                 if countEmptyColumn == 1:
-                    outbound = NONE
-                    pc = NONE
+                    outbound = NONE_CONSTANT
+                    pc = NONE_CONSTANT
 
                 outboundRoad = (outbound, pc)
                 if outboundRoad in roadMap:
-                    addOutbound(outboundDAO, currentRoad,
+                    addOutbound(outboundDAO, roadMap[currentRoad],
                                 roadMap[outboundRoad])
                 else:
                     if outboundRoad in remainOutbound:
-                        remainOutbound[outboundRoad].append(currentRoad)
+                        remainOutbound[outboundRoad].append(roadMap[currentRoad])
                     else:
-                        remainOutbound[outboundRoad] = [currentRoad]
+                        remainOutbound[outboundRoad] = [roadMap[currentRoad]]
 
 
 def migrate(db: orm.Database):
