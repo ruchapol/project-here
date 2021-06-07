@@ -14,3 +14,6 @@ class IPredictionModel:
 
     def getNumberOfFeature(self) -> int:
         raise NotImplementedError
+
+    def getModel(self) -> any:
+        raise NotImplementedError

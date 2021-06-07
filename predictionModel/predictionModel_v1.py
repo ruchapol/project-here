@@ -100,6 +100,9 @@ class PredictionModelV1(IPredictionModel):
     def getTheta(self) -> List[float]:
         return [self.linearRegression.intercept_, *self.linearRegression.coef_]
 
+    def getModel(self, minutes: str) -> any:
+        return self.linearRegression[minutes]
+
     def getNumberOfFeature(self) -> int:
         return self.numOfFeatures
 

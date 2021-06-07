@@ -1,5 +1,7 @@
+from repository.model import ModelRepo
+from model.database.model import createModelDAO
 from script.migrateTable import migrate
-from predictionModel.predictionModelRunner import PredictionModelRunner
+from predictionModel.predictionModelTrainer import PredictionModelTrainer
 from utils.path import getPath
 from model.ID import ID
 from model.featureExtraction.input import APIInput
@@ -19,6 +21,7 @@ from os.path import isfile, join
 from tqdm import tqdm
 from predictionModel.predictionModel_v1 import PredictionModelV1
 
+
 def runExtraction(db: orm.Database):
     roadsegmentDAO = createRoadSegmentDAO(db, orm)
     outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
@@ -30,13 +33,13 @@ def runExtraction(db: orm.Database):
 
     # create graph
     graph = Graph(roadsegmentRepo)
-    featureExtraction:FeatureExtraction = FeatureExtraction({}, datasetRepo, graph)
+    featureExtraction: FeatureExtraction = FeatureExtraction(
+        {}, datasetRepo, graph)
     # apiInputs = getAPIInputsFromXML([".","data","data20212905_013807.xml"])
     # data = featureExtraction.processInput(apiInputs)
     # featureExtraction.saveToDB(data)
 
-
-    tfPath = getPath([".","data2month_current"])
+    tfPath = getPath([".", "data2month_current"])
     for day in tqdm(listdir(tfPath)):
         for hour in tqdm(listdir(join(tfPath, day))):
             for minute in listdir(join(tfPath, day, hour)):
@@ -47,19 +50,24 @@ def runExtraction(db: orm.Database):
                 featureExtraction.saveToDB(datasets)
     print(timerBenchmark)
 
+
 def runTrainModel():
     roadsegmentDAO = createRoadSegmentDAO(db, orm)
     outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
     datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
+    modelDAO = createModelDAO(db, orm, roadsegmentDAO)
     db.generate_mapping(create_tables=True)
     # create repo
     roadsegmentRepo = RoadSegmentRepo(roadsegmentDAO, outboundDAO)
     datasetRepo = DataSetRepo(roadsegmentDAO, datasetDAO)
+    modelRepo = ModelRepo(roadsegmentDAO, modelDAO)
     # prepare Model
     predictionModel = PredictionModelV1()
 
-    predictionModelRunner = PredictionModelRunner(roadsegmentRepo, datasetRepo, predictionModel)
+    predictionModelRunner = PredictionModelTrainer(
+        roadsegmentRepo, datasetRepo, modelRepo, predictionModel)
     predictionModelRunner.train()
+
 
 if __name__ == '__main__':
     # writeFileXML()
@@ -68,11 +76,4 @@ if __name__ == '__main__':
     db.bind(provider='sqlite', filename='database.db', create_db=True)
     # runExtraction(db)
     # runTrainModel()
-    migrate(db)
-
-
-
-
-
-
-   
+    # migrate(db)

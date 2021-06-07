@@ -1,3 +1,4 @@
+from model.database.model import createModelDAO
 from utils.path import getPath
 from playground.play_untangle import run
 from pony import orm
@@ -135,10 +136,11 @@ def migrate(db: orm.Database):
     roadSegmentDAO = createRoadSegmentDAO(db, orm)
     outboundDAO = createOutboundDAO(db, orm, roadSegmentDAO)
     datasetDAO = createDatasetDAO(db, orm, roadSegmentDAO)
+    modelDAO = createModelDAO(db, orm, roadSegmentDAO)
     db.generate_mapping(create_tables=True)
 
     # read file and put to db
-    insert_database(roadSegmentDAO, outboundDAO)
+    # insert_database(roadSegmentDAO, outboundDAO)
     # t=query(roadSegmentDAO)
     # for a in t:
     #     print(a.RoadID,a.RoadSegmentID, a.To)
