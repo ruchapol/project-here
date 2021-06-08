@@ -1,3 +1,4 @@
+from predictionModel.predictionModelPredictor import PredictionModelPredictor
 from repository.model import ModelRepo
 from model.database.model import createModelDAO
 from script.migrateTable import migrate
@@ -68,7 +69,22 @@ def runTrainModel():
         roadsegmentRepo, datasetRepo, modelRepo, predictionModel)
     predictionModelRunner.train()
 
+def runPredictModel():
+    roadsegmentDAO = createRoadSegmentDAO(db, orm)
+    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
+    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
+    modelDAO = createModelDAO(db, orm, roadsegmentDAO)
+    db.generate_mapping(create_tables=True)
+    # create repo
+    datasetRepo = DataSetRepo(roadsegmentDAO, datasetDAO)
+    modelRepo = ModelRepo(roadsegmentDAO, modelDAO)
+    # prepare Model
+    predictionModel = PredictionModelV1()
 
+    predictionModelPredictor = PredictionModelPredictor(
+        modelRepo, datasetRepo, predictionModel)
+    predictResult = predictionModelPredictor.predictSpeedUncutFromNow(ID(RoadID="219-00566",SegmentID="40504"), "15")
+    print("predictResult=",predictResult)
 if __name__ == '__main__':
     # writeFileXML()
 
@@ -76,4 +92,5 @@ if __name__ == '__main__':
     db.bind(provider='sqlite', filename='database.db', create_db=True)
     # runExtraction(db)
     # runTrainModel()
+    runPredictModel()
     # migrate(db)

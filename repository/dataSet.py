@@ -1,7 +1,7 @@
 from re import L
 from typing import Dict, List
 from interface.repository import IRepository
-from pony.orm import db_session, select, get, desc
+from pony.orm import db_session, select, get, desc, avg
 from pony.orm.core import OrmError
 from pony import orm
 from model.database.dataset import DataSetDTO
@@ -50,17 +50,73 @@ class DataSetRepo(IRepository):
                 if len(latestDataset) == 0:
                     return [None]
                 # self.cache[id] = latest
-                return latestDataset
-            datasetsDAO = select(x for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
+                datasetsDTO: List[DataSetDTO] = []
+                for dataset in latestDataset:
+                    datasetsDTO.append(
+                        self._datasetDAOToDTOWithFillAverage(id, dataset))
+                return datasetsDTO
+            datasetsDAO = select(
+                x for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
             datasetsDTO: List[DataSetDTO] = []
             for dataset in datasetsDAO:
-                datasetsDTO.append(self._datasetDAOToDTO(ID, dataset))
+                datasetsDTO.append(self._datasetDAOToDTO(id, dataset))
             return datasetsDTO
         except OrmError as e:
-            print("OrmError:",e)
+            print("OrmError:", e)
             return [None]
 
-    def _datasetDAOToDTO(self, id:ID, dataSetDAO) -> DataSetDTO:
+    @db_session
+    def _findAvgJamFactorDuration(self, id: ID) -> float:
+        print("_findAvgJamFactorDuration")
+        avgVal = avg(
+            x.JamFactorDuration for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
+        return self._ifNoneReturnZero(avgVal)
+
+    @db_session
+    def _findAvgDeltaJamFactor(self, id: ID) -> float:
+        print("_findAvgDeltaJamFactor")
+        avgVal = avg(
+            x.DeltaJamFactor for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
+        return self._ifNoneReturnZero(avgVal)
+
+    @db_session
+    def _findAvgNeightbourJamFactor(self, id: ID) -> float:
+        print("_findAvgNeightbourJamFactor")
+        avgVal = avg(
+            x.NeightbourJamFactor for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
+        return self._ifNoneReturnZero(avgVal)
+
+    @db_session
+    def _findAvgNeightbourJamFactorDuration(self, id: ID) -> float:
+        print("_findAvgNeightbourJamFactorDuration")
+        avgVal = avg(
+            x.NeightbourJamFactorDuration for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
+        return self._ifNoneReturnZero(avgVal)
+
+    def _ifNoneReturnZero(self, number: float) -> float:
+        return 0 if number is None else number
+
+    def _datasetDAOToDTOWithFillAverage(self, id: ID, dataSetDAO) -> DataSetDTO:
+        d = DataSetDTO()
+        d.ID = id
+        d.DayOfWeek = dataSetDAO.DayOfWeek
+        d.Day = dataSetDAO.Day
+        d.Hour = dataSetDAO.Hour
+        d.Minute = dataSetDAO.Minute
+        d.JamFactor = dataSetDAO.JamFactor
+        d.JamFactorDuration = dataSetDAO.JamFactorDuration if dataSetDAO.JamFactorDuration is not None else self._findAvgJamFactorDuration(
+            id)
+        d.DeltaJamFactor = dataSetDAO.DeltaJamFactor if dataSetDAO.DeltaJamFactor is not None else self._findAvgDeltaJamFactor(
+            id)
+        d.NeightbourJamFactor = dataSetDAO.NeightbourJamFactor if dataSetDAO.NeightbourJamFactor is not None else self._findAvgNeightbourJamFactor(
+            id)
+        d.NeightbourJamFactorDuration = dataSetDAO.NeightbourJamFactorDuration if dataSetDAO.NeightbourJamFactorDuration is not None else self._findAvgNeightbourJamFactorDuration(
+            id)
+        d.TimeStamp = dataSetDAO.TimeStamp
+        d.SpeedUncut = dataSetDAO.SpeedUncut
+        return d
+
+    def _datasetDAOToDTO(self, id: ID, dataSetDAO) -> DataSetDTO:
         d = DataSetDTO()
         d.ID = id
         d.DayOfWeek = dataSetDAO.DayOfWeek

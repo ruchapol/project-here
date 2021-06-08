@@ -12,3 +12,6 @@ plusService = PlusService(repo)
 # Route
 app.register_blueprint(getBlueprint(plusService))
 app.register_blueprint(health_blueprint)
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1")

@@ -9,13 +9,19 @@ class ModelDTO:
     Model_30: bytes
     Model_45: bytes
     Model_60: bytes
+    
+    def _mapMultisetToByte(self, multiset) -> bytes:
+        for data in multiset:
+            return data
 
     def setModel(self, modelDAO) -> 'ModelDTO':
-        self.Model_5 = modelDAO.Model_5
-        self.Model_15 = modelDAO.Model_15
-        self.Model_30 = modelDAO.Model_30
-        self.Model_45 = modelDAO.Model_45
-        self.Model_60 = modelDAO.Model_60
+        self.Model_5 = self._mapMultisetToByte(modelDAO.Model_5)
+        self.Model_15 = self._mapMultisetToByte(modelDAO.Model_15)
+        self.Model_30 = self._mapMultisetToByte(modelDAO.Model_30)
+        self.Model_45 = self._mapMultisetToByte(modelDAO.Model_45)
+        self.Model_60 = self._mapMultisetToByte(modelDAO.Model_60)
+        
+        # print("[setModel][Model_5]",self.Model_5)
         return self
 
 def createModelDAO(db: Database, orm: orm, RoadSegmentDAO):

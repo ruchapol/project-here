@@ -1,4 +1,6 @@
 from datetime import datetime, timedelta
+import pickle
+from model.database.model import ModelDTO
 from interface.predictionModel import IPredictionModel
 from typing import Dict, List, Tuple
 import numpy as np
@@ -90,6 +92,12 @@ class PredictionModelV1(IPredictionModel):
         # print(reg.score(X, y))
         # print(reg.predict(np.array([[3, 5]])))
 
+    def load(self, model: ModelDTO):
+        self.linearRegression["5"] = pickle.loads(model.Model_5)
+        self.linearRegression["15"] = pickle.loads(model.Model_15)
+        self.linearRegression["30"] = pickle.loads(model.Model_30)
+        self.linearRegression["45"] = pickle.loads(model.Model_45)
+        self.linearRegression["60"] = pickle.loads(model.Model_60)
     
     def predict(self, x:List) -> Dict[str, List[float]]:
         result = {}

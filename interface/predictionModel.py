@@ -6,6 +6,9 @@ class IPredictionModel:
     def train(self, x:List, y:List[float], timestamp:List[str]):
         raise NotImplementedError
 
+    def load(self):
+        raise NotImplementedError
+
     def predict(self, x:List) -> List[float]:
         raise NotImplementedError
 

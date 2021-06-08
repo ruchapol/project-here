@@ -16,7 +16,7 @@ class ModelRepo(IRepository):
     @db_session
     def find(self, id: ID) -> ModelDTO:
         # access Model_DAO of ID
-        ModelDAO = get(self.roadSegmentDAO[id.RoadID, id.SegmentID].Model)
+        ModelDAO = self.roadSegmentDAO[id.RoadID, id.SegmentID].Model
         return ModelDTO().setModel(ModelDAO)
 
     @db_session

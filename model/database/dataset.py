@@ -29,6 +29,24 @@ class DataSetDTO:
         self.JamFactor = jamFactor
         return self
 
+    def setAllFeature(self, DayOfWeek: int, Day: int, Hour: int, Minute: int,
+                      JamFactor: float, JamFactorDuration: int, DeltaJamFactor: int, 
+                      NeightbourJamFactor: float, NeightbourJamFactorDuration: int) -> 'DataSetDTO':
+        self.DayOfWeek = DayOfWeek
+        self.Day = Day
+        self.Hour = Hour
+        self.Minute = Minute
+        self.JamFactor = JamFactor
+        self.JamFactorDuration = JamFactorDuration
+        self.DeltaJamFactor = DeltaJamFactor
+        self.NeightbourJamFactor = NeightbourJamFactor
+        self.NeightbourJamFactorDuration = NeightbourJamFactorDuration
+        return self
+
+    def setSpeedUncut(self, speedUncut: float) -> 'DataSetDTO':
+        self.SpeedUncut = speedUncut
+        return self
+
     def toJSON(self):
         return json.dumps(self, default=lambda o: o.__dict__, 
             sort_keys=True, indent=4)

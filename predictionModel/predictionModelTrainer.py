@@ -54,8 +54,8 @@ class PredictionModelTrainer:
             x[n] = [x[n][f] if x[n][f] is not None else mean[f] for f in range(featureNum)]
         return xy
         
-    def _dataSetDTOListToXY(self, datasets: List[DataSetDTO]) -> Tuple[List,List]:
-        xy = ([],[],[])
+    def _dataSetDTOListToXY(self, datasets: List[DataSetDTO]) -> Tuple[List,List,List]:
+        xyt = ([],[],[])
         for dataset in datasets:
             x = []
             x.append(dataset.DayOfWeek)
@@ -63,14 +63,14 @@ class PredictionModelTrainer:
             x.append(dataset.Hour)
             x.append(dataset.Minute)
             x.append(dataset.JamFactor)
-            x.append(dataset.NeightbourJamFactor)
             x.append(dataset.JamFactorDuration)
             x.append(dataset.DeltaJamFactor)
+            x.append(dataset.NeightbourJamFactor)
             x.append(dataset.NeightbourJamFactorDuration)
-            xy[0].append(x)
-            xy[1].append(dataset.SpeedUncut)
-            xy[2].append(parseRFCtimeToDatetime(dataset.TimeStamp))
-        return xy    
+            xyt[0].append(x)
+            xyt[1].append(dataset.SpeedUncut)
+            xyt[2].append(parseRFCtimeToDatetime(dataset.TimeStamp))
+        return xyt    
 
     def saveToDB(self,id: ID, model: ModelDTO):
         self.modelRepo.save(id, model)
