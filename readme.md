@@ -13,6 +13,7 @@
         * [x] ดึงข้อมูลจากโมเดลไปใส่ linear regression model
         * [x] ทำนายข้อมูลล่าสุดได้ ได้ผลออกมาเป็น SU (SpeedUncut)
     * [x] เขียน test predictionModelTrainer
+    * [ ] เขียน test predictionModelPredictor
     * [ ] เขียนตัวแปลงจาก SU -> เวลา
     * [ ] เขียน Prediction API
         * [ ] ดึง DataSet ของทุก segment ใน เส้นทาง
@@ -20,6 +21,7 @@
         * [ ] เอาเวลามารวมกันตามเส้นทางที่ต้องผ่านแล้วส่งคืน
 * [ ] BACKEND API
 * [ ] รูป Visualize
+* [ ] redesign โครงให้รองรับ model v2 ได้
 
 ##### Question
 
