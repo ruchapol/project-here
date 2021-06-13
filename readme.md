@@ -14,7 +14,7 @@
         * [x] ทำนายข้อมูลล่าสุดได้ ได้ผลออกมาเป็น SU (SpeedUncut)
     * [x] เขียน test predictionModelTrainer
     * [ ] เขียน test predictionModelPredictor
-    * [ ] เขียนตัวแปลงจาก SU -> เวลา
+    * [X] เขียนตัวแปลงจาก SU -> เวลา
     * [ ] เขียน Prediction API
         * [ ] ดึง DataSet ของทุก segment ใน เส้นทาง
         * [ ] เอา DataSet แต่ละตัวเข้า predictionModelPredictor เพื่อเอา SU ออกมา แล้วแปลงเป็น เวลา

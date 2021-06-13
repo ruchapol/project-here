@@ -1,3 +1,5 @@
+from repository.outbound import OutboundRepo
+from travelTimeCalculator.travelTimeCalculator import TravelTimeCalculator
 from predictionModel.predictionModelPredictor import PredictionModelPredictor
 from repository.model import ModelRepo
 from model.database.model import createModelDAO
@@ -85,6 +87,22 @@ def runPredictModel():
         modelRepo, datasetRepo, predictionModel)
     predictResult = predictionModelPredictor.predictSpeedUncutFromNow(ID(RoadID="219-00566",SegmentID="40504"), "15")
     print("predictResult=",predictResult)
+
+def runTravelTimeCalculator():
+    roadsegmentDAO = createRoadSegmentDAO(db, orm)
+    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
+    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
+    modelDAO = createModelDAO(db, orm, roadsegmentDAO)
+    db.generate_mapping(create_tables=True)
+
+    # create repo
+    outboundRepo = OutboundRepo(roadsegmentDAO, outboundDAO)
+    travelTimeCalculator = TravelTimeCalculator(outboundRepo)
+    idA=ID("219-57496","57499")
+    idB=ID("219-57496","57498")
+    timeTravel = travelTimeCalculator.calculateTravelTime(idA,idB,10,20) # 2.83436370955463
+    print(timeTravel)
+
 if __name__ == '__main__':
     # writeFileXML()
 
@@ -92,5 +110,6 @@ if __name__ == '__main__':
     db.bind(provider='sqlite', filename='database.db', create_db=True)
     # runExtraction(db)
     # runTrainModel()
-    runPredictModel()
+    # runPredictModel()
+    runTravelTimeCalculator()
     # migrate(db)

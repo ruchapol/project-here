@@ -15,9 +15,21 @@ class RoadSegmentDTO:
 
 class OutboundDTO:
     OutboundID: int
-    From: RoadSegmentDTO  # point to RowID
-    To: RoadSegmentDTO  # point to RowID
-    Distance: float
+    From: ID 
+    To: ID  
+    DistanceKM: float
+
+    def setFrom(self, id: ID) -> 'OutboundDTO':
+        self.From = id
+        return self
+        
+    def setTo(self, id: ID) -> 'OutboundDTO':
+        self.To = id
+        return self
+
+    def setDistanceKM(self, dist: float) -> 'OutboundDTO':
+        self.DistanceKM = dist
+        return self
 
 def createRoadSegmentDAO(db: Database, orm: orm):
     class RoadSegment(db.Entity):
