@@ -31,12 +31,13 @@ class PredictionModelPredictor:
         x.append(dataset.DeltaJamFactor)
         x.append(dataset.NeightbourJamFactorDuration)
         return [x]
-
+        
     def predictSpeedUncutFromNow(self, roadID: ID, minuteAhead: str) -> float:
         queryOption: QueryOption = QueryOption()
         queryOption.setOption(QueryOption.Latest, "true")
         latestDataSet: DataSetDTO = self.datasetRepo.find(roadID, queryOption)[0]
         predictionModelData: ModelDTO = self.modelRepo.find(roadID)
+        linearRegressionModels = modelDataToLinearRegression(predictionModelData) 
         self.predictionModel.load(predictionModelData)
         print(latestDataSet.toJSON())
         datasetX = self._datasetDTOtoX(latestDataSet)

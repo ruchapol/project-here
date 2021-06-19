@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 class IPredictionModel:
     
@@ -9,7 +9,7 @@ class IPredictionModel:
     def load(self):
         raise NotImplementedError
 
-    def predict(self, x:List) -> List[float]:
+    def predict(self, x:List) -> Dict[str, List[float]]:
         raise NotImplementedError
 
     def getTheta(self) -> List[float]:

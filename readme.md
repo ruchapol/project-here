@@ -9,13 +9,14 @@
 * [ ] PREDICTION API
     * [x] เอาข้อมูล distance ลง outbound
     * [x] เอา Model ที่เทรนแล้ว ลงใน base ในรูปแบบ blob
-    * [x] เขียน predictionModelPredictor ให้เสร็จ <-- Nut
+    * [x] เขียน predictionModelPredictor ให้เสร็จ 
         * [x] ดึงข้อมูลจากโมเดลไปใส่ linear regression model
         * [x] ทำนายข้อมูลล่าสุดได้ ได้ผลออกมาเป็น SU (SpeedUncut)
     * [x] เขียน test predictionModelTrainer
-    * [ ] เขียน test predictionModelPredictor
+    * [ ] เขียน test predictionModelPredictor <---
     * [X] เขียนตัวแปลงจาก SU -> เวลา
     * [ ] เขียน Prediction API
+        * [ ] list of segment for each route <---
         * [ ] ดึง DataSet ของทุก segment ใน เส้นทาง
         * [ ] เอา DataSet แต่ละตัวเข้า predictionModelPredictor เพื่อเอา SU ออกมา แล้วแปลงเป็น เวลา
         * [ ] เอาเวลามารวมกันตามเส้นทางที่ต้องผ่านแล้วส่งคืน
