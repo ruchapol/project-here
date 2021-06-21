@@ -13,7 +13,7 @@
         * [x] ดึงข้อมูลจากโมเดลไปใส่ linear regression model
         * [x] ทำนายข้อมูลล่าสุดได้ ได้ผลออกมาเป็น SU (SpeedUncut)
     * [x] เขียน test predictionModelTrainer
-    * [ ] เขียน test predictionModelPredictor <---
+    * [x] เขียน test predictionModelPredictor 
     * [X] เขียนตัวแปลงจาก SU -> เวลา
     * [ ] เขียน Prediction API
         * [ ] list of segment for each route <---
