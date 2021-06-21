@@ -1,3 +1,4 @@
+from predictionModel.predictionModel_v1 import PredictionModelV1
 from interface.modelDTOMapper import IModelDTOMapper
 from interface.predictionModel import IPredictionModel
 from typing import Any, Dict
@@ -22,12 +23,14 @@ class ModelDTOToLinearRegression(IModelDTOMapper):
 
     def _modelDTOToLinearRegression(self, modelDTO: ModelDTO) -> IPredictionModel:
         linearRegression = {} # TODO: fix to IPredictionModel so predictionModelPredictor and predictionModelTrainer can use this.
+        predictionModel = PredictionModelV1()
         linearRegression["5"] = pickle.loads(modelDTO.Model_5)
         linearRegression["15"] = pickle.loads(modelDTO.Model_15)
         linearRegression["30"] = pickle.loads(modelDTO.Model_30)
         linearRegression["45"] = pickle.loads(modelDTO.Model_45)
         linearRegression["60"] = pickle.loads(modelDTO.Model_60)
-        return linearRegression
+        predictionModel.setLinearRegressionModel(linearRegression)
+        return predictionModel
 
     def modelDTOToClass(self, modelDTO: ModelDTO) -> IPredictionModel:
         return self._modelDTOToLinearRegression(modelDTO)

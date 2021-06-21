@@ -99,6 +99,13 @@ class PredictionModelV1(IPredictionModel):
         self.linearRegression["45"] = pickle.loads(model.Model_45)
         self.linearRegression["60"] = pickle.loads(model.Model_60)
     
+    def setLinearRegressionModel(self, linear: Dict[str, LinearRegression]):
+        self.linearRegression["5"] = linear["5"]
+        self.linearRegression["15"] = linear["15"]
+        self.linearRegression["30"] = linear["30"]
+        self.linearRegression["45"] = linear["45"]
+        self.linearRegression["60"] = linear["60"]
+
     def predict(self, x:List) -> Dict[str, List[float]]:
         result = {}
         for time in self.times:

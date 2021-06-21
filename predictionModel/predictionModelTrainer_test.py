@@ -1,3 +1,5 @@
+from interface.modelDTOMapper import IModelDTOMapper
+from repository.model_mock import ModelRepoMock
 import unittest
 from predictionModel.predictionModelTrainer import PredictionModelTrainer
 from interface.repository import IRepository
@@ -11,8 +13,8 @@ from utils.date import parseRFCtimeToDatetime
 
 class PredictionModelForTest(PredictionModelTrainer):
 
-    def __init__(self, roadSegmentRepo: IRepository, datasetRepo: IRepository, modelRepo: IRepository, predictionModel: IPredictionModel):
-        super().__init__(roadSegmentRepo, datasetRepo, modelRepo, predictionModel)
+    def __init__(self, roadSegmentRepo: IRepository, datasetRepo: IRepository, modelRepo: IRepository, predictionModel: IPredictionModel, mapper: IModelDTOMapper):
+        super().__init__(roadSegmentRepo, datasetRepo, modelRepo, predictionModel, mapper)
 
     def fillAverageIfNone(self, xy: Tuple[List,List]):
         return self._fillAverageIfNone(xy)
@@ -25,7 +27,7 @@ class TestPredictionModelTrainer(unittest.TestCase):
     p: PredictionModelForTest
     def setUp(self):
         # self.p = PredictionModelForTest(RoadSegmentRepoMock({}), DataSetRepoMock({}), None)
-        self.p = PredictionModelForTest(None, None, None, None) 
+        self.p = PredictionModelForTest(None, None, None, None, None) 
 
     def tearDown(self):
         del self.p

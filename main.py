@@ -1,3 +1,4 @@
+from mapper.modelDTOToLinearRegression import ModelDTOToLinearRegression
 from repository.outbound import OutboundRepo
 from travelTimeCalculator.travelTimeCalculator import TravelTimeCalculator
 from predictionModel.predictionModelPredictor import PredictionModelPredictor
@@ -66,9 +67,11 @@ def runTrainModel():
     modelRepo = ModelRepo(roadsegmentDAO, modelDAO)
     # prepare Model
     predictionModel = PredictionModelV1()
+    # prepare mapper
+    mapper = ModelDTOToLinearRegression()
 
     predictionModelRunner = PredictionModelTrainer(
-        roadsegmentRepo, datasetRepo, modelRepo, predictionModel)
+        roadsegmentRepo, datasetRepo, modelRepo, predictionModel, mapper)
     predictionModelRunner.train()
 
 def runPredictModel():
@@ -82,9 +85,11 @@ def runPredictModel():
     modelRepo = ModelRepo(roadsegmentDAO, modelDAO)
     # prepare Model
     predictionModel = PredictionModelV1()
+    # prepare mapper
+    mapper = ModelDTOToLinearRegression()
 
     predictionModelPredictor = PredictionModelPredictor(
-        modelRepo, datasetRepo, predictionModel)
+        modelRepo, datasetRepo, predictionModel, mapper)
     predictResult = predictionModelPredictor.predictSpeedUncutFromNow(ID(RoadID="219-00566",SegmentID="40504"), "15")
     print("predictResult=",predictResult)
 
@@ -110,6 +115,6 @@ if __name__ == '__main__':
     db.bind(provider='sqlite', filename='database.db', create_db=True)
     # runExtraction(db)
     # runTrainModel()
-    # runPredictModel()
-    runTravelTimeCalculator()
+    runPredictModel()
+    # runTravelTimeCalculator()
     # migrate(db)

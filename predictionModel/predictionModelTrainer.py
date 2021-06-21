@@ -6,6 +6,7 @@ from model.ID import ID
 from typing import Dict, List, Tuple
 from interface.repository import IRepository
 from interface.predictionModel import IPredictionModel
+from interface.modelDTOMapper import IModelDTOMapper
 import statistics
 from utils.date import parseRFCtimeToDatetime
 import pickle
@@ -14,11 +15,15 @@ class PredictionModelTrainer:
     datasetRepo: IRepository
     modelRepo: IRepository
     predictionModel :IPredictionModel
-    def __init__(self, roadSegmentRepo: IRepository, datasetRepo: IRepository, modelRepo: IRepository,predictionModel: IPredictionModel):
+    modelDTOMapper :IModelDTOMapper
+    def __init__(self, roadSegmentRepo: IRepository, datasetRepo: IRepository, 
+                 modelRepo: IRepository, predictionModel: IPredictionModel,
+                 modelDTOMapper: IModelDTOMapper):
         self.roadSegmentRepo = roadSegmentRepo
         self.datasetRepo = datasetRepo
         self.modelRepo = modelRepo
         self.predictionModel = predictionModel
+        self.modelDTOMapper = modelDTOMapper
 
     def train(self):
         roadSegments: Dict[ID, RoadSegmentDTO] = self.roadSegmentRepo.findAll()
@@ -30,15 +35,8 @@ class PredictionModelTrainer:
             if len(x) == 0:
                 continue
             self.predictionModel.train(x, y, t)
-            modelDTO = ModelDTO()
-            modelDTO.Model_5 = pickle.dumps(self.predictionModel.getModel("5"))
-            modelDTO.Model_15 = pickle.dumps(self.predictionModel.getModel("15"))
-            modelDTO.Model_30 = pickle.dumps(self.predictionModel.getModel("30"))
-            modelDTO.Model_45 = pickle.dumps(self.predictionModel.getModel("45"))
-            modelDTO.Model_60 = pickle.dumps(self.predictionModel.getModel("60"))
+            modelDTO = self.modelDTOMapper.classToModelDTO(self.predictionModel)
             self.saveToDB(roadID, modelDTO)
-            
-            
 
     def _fillAverageIfNone(self, xy: Tuple[List,List]):
         x = xy[0]

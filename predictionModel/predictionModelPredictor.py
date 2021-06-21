@@ -1,3 +1,4 @@
+from interface.modelDTOMapper import IModelDTOMapper
 from model.database.model import ModelDTO
 from model.database.dataset import DataSetDTO
 from repository.dataSet import QueryOption
@@ -13,11 +14,13 @@ class PredictionModelPredictor:
     modelRepo: IRepository
     datasetRepo: IRepository
     predictionModel :IPredictionModel
+    iModelDtoMapper :IModelDTOMapper
     
-    def __init__(self, modelRepo: IRepository,datasetRepo: IRepository, predictionModel: IPredictionModel):
+    def __init__(self, modelRepo: IRepository,datasetRepo: IRepository, predictionModel: IPredictionModel, iModelDtoMapper: IModelDTOMapper):
         self.modelRepo = modelRepo
         self.datasetRepo = datasetRepo
         self.predictionModel = predictionModel
+        self.iModelDtoMapper = iModelDtoMapper
 
     def _datasetDTOtoX(self, dataset: DataSetDTO) -> List:
         x = []
@@ -36,10 +39,9 @@ class PredictionModelPredictor:
         queryOption: QueryOption = QueryOption()
         queryOption.setOption(QueryOption.Latest, "true")
         latestDataSet: DataSetDTO = self.datasetRepo.find(roadID, queryOption)[0]
-        predictionModelData: ModelDTO = self.modelRepo.find(roadID)
-        linearRegressionModels = modelDataToLinearRegression(predictionModelData) 
-        self.predictionModel.load(predictionModelData)
         print(latestDataSet.toJSON())
+        predictionModelData: ModelDTO = self.modelRepo.find(roadID)
+        self.predictionModel = self.iModelDtoMapper.modelDTOToClass(predictionModelData) 
         datasetX = self._datasetDTOtoX(latestDataSet)
         speedUncut = self.predictionModel.predict(datasetX)[minuteAhead]
         return speedUncut
