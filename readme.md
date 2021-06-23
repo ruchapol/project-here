@@ -16,8 +16,9 @@
     * [x] เขียน test predictionModelPredictor 
     * [X] เขียนตัวแปลงจาก SU -> เวลา
     * [ ] เขียน Prediction API
-        * [ ] list of segment for each route <---
-        * [ ] ดึง DataSet ของทุก segment ใน เส้นทาง
+        * [x] list of segment for each route <--- python/routing/graph_route2 line 500
+        * [x] ดึง DataSet ของทุก segment ใน เส้นทาง
+        * [ ] plot graph of route segment
         * [ ] เอา DataSet แต่ละตัวเข้า predictionModelPredictor เพื่อเอา SU ออกมา แล้วแปลงเป็น เวลา
         * [ ] เอาเวลามารวมกันตามเส้นทางที่ต้องผ่านแล้วส่งคืน
 * [ ] BACKEND API

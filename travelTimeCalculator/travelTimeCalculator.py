@@ -9,6 +9,7 @@ class TravelTimeCalculator:
     def __init__(self, outboundRepo):
         self.outboundRepo = outboundRepo
 
+    # time as hour(s)
     def calculateTravelTime(self, a: ID, b: ID, vA: float, vB: float):
         outboundAToB: OutboundDTO = self.outboundRepo.find(a, b)
         halfDistance = outboundAToB.DistanceKM / 2

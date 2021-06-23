@@ -39,7 +39,7 @@ class PredictionModelPredictor:
         queryOption: QueryOption = QueryOption()
         queryOption.setOption(QueryOption.Latest, "true")
         latestDataSet: DataSetDTO = self.datasetRepo.find(roadID, queryOption)[0]
-        print(latestDataSet.toJSON())
+        # print(latestDataSet.toJSON())
         predictionModelData: ModelDTO = self.modelRepo.find(roadID)
         self.predictionModel = self.iModelDtoMapper.modelDTOToClass(predictionModelData) 
         datasetX = self._datasetDTOtoX(latestDataSet)

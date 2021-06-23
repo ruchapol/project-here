@@ -1,3 +1,4 @@
+from apiPrediction.service import PredictTravelTimeService
 from mapper.modelDTOToLinearRegression import ModelDTOToLinearRegression
 from repository.outbound import OutboundRepo
 from travelTimeCalculator.travelTimeCalculator import TravelTimeCalculator
@@ -108,6 +109,29 @@ def runTravelTimeCalculator():
     timeTravel = travelTimeCalculator.calculateTravelTime(idA,idB,10,20) # 2.83436370955463
     print(timeTravel)
 
+def runPredictionAPI():
+    roadsegmentDAO = createRoadSegmentDAO(db, orm)
+    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
+    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
+    modelDAO = createModelDAO(db, orm, roadsegmentDAO)
+    db.generate_mapping(create_tables=True)
+
+    # create repo
+    datasetRepo = DataSetRepo(roadsegmentDAO, datasetDAO)
+    modelRepo = ModelRepo(roadsegmentDAO, modelDAO)
+    outboundRepo = OutboundRepo(roadsegmentDAO, outboundDAO)
+    # prepare Model
+    predictionModel = PredictionModelV1()
+    # prepare dependencies
+    mapper = ModelDTOToLinearRegression()
+    travelTimeCalculator = TravelTimeCalculator(outboundRepo)
+    predictionModelPredictor = PredictionModelPredictor(
+        modelRepo, datasetRepo, predictionModel, mapper)
+
+    predictionAPI = PredictTravelTimeService(predictionModelPredictor, travelTimeCalculator)
+    predictionAPI.execute("พระจอม","วงศ์สว่าง")
+
+
 if __name__ == '__main__':
     # writeFileXML()
 
@@ -115,6 +139,7 @@ if __name__ == '__main__':
     db.bind(provider='sqlite', filename='database.db', create_db=True)
     # runExtraction(db)
     # runTrainModel()
-    runPredictModel()
+    # runPredictModel()
     # runTravelTimeCalculator()
+    runPredictionAPI()
     # migrate(db)
