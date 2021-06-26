@@ -19,6 +19,9 @@
         * [x] list of segment for each route <--- python/routing/graph_route2 line 500
         * [x] ดึง DataSet ของทุก segment ใน เส้นทาง
         * [ ] plot graph of route segment
+            * [x] แกะโค้ด playground/show-here-lat-long2.py และแปะคอมเม้นไว้
+            * [ ] use script in playground/show-here-lat-long2.py as guidance (search for comment #1,#2) 
+            * [ ] get data from RoadSegment, Outbound and plot graph to check correctness
         * [ ] เอา DataSet แต่ละตัวเข้า predictionModelPredictor เพื่อเอา SU ออกมา แล้วแปลงเป็น เวลา
         * [ ] เอาเวลามารวมกันตามเส้นทางที่ต้องผ่านแล้วส่งคืน
 * [ ] BACKEND API
