@@ -25,13 +25,10 @@ from os import listdir
 from os.path import isfile, join
 from tqdm import tqdm
 from predictionModel.predictionModel_v1 import PredictionModelV1
+import matplotlib.pyplot as plt
 
 
 def runExtraction(db: orm.Database):
-    roadsegmentDAO = createRoadSegmentDAO(db, orm)
-    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
-    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
-    db.generate_mapping(create_tables=True)
     # create repo
     roadsegmentRepo = RoadSegmentRepo(roadsegmentDAO, outboundDAO)
     datasetRepo = DataSetRepo(roadsegmentDAO, datasetDAO)
@@ -57,11 +54,6 @@ def runExtraction(db: orm.Database):
 
 
 def runTrainModel():
-    roadsegmentDAO = createRoadSegmentDAO(db, orm)
-    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
-    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
-    modelDAO = createModelDAO(db, orm, roadsegmentDAO)
-    db.generate_mapping(create_tables=True)
     # create repo
     roadsegmentRepo = RoadSegmentRepo(roadsegmentDAO, outboundDAO)
     datasetRepo = DataSetRepo(roadsegmentDAO, datasetDAO)
@@ -75,12 +67,8 @@ def runTrainModel():
         roadsegmentRepo, datasetRepo, modelRepo, predictionModel, mapper)
     predictionModelRunner.train()
 
+
 def runPredictModel():
-    roadsegmentDAO = createRoadSegmentDAO(db, orm)
-    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
-    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
-    modelDAO = createModelDAO(db, orm, roadsegmentDAO)
-    db.generate_mapping(create_tables=True)
     # create repo
     datasetRepo = DataSetRepo(roadsegmentDAO, datasetDAO)
     modelRepo = ModelRepo(roadsegmentDAO, modelDAO)
@@ -91,45 +79,76 @@ def runPredictModel():
 
     predictionModelPredictor = PredictionModelPredictor(
         modelRepo, datasetRepo, predictionModel, mapper)
-    predictResult = predictionModelPredictor.predictSpeedUncutFromNow(ID(RoadID="219-00566",SegmentID="40504"), "15")
-    print("predictResult=",predictResult)
+    predictResult = predictionModelPredictor.predictSpeedUncutFromNow(
+        ID(RoadID="219-00566", SegmentID="40504"), "15")
+    print("predictResult=", predictResult)
+
 
 def runTravelTimeCalculator():
-    roadsegmentDAO = createRoadSegmentDAO(db, orm)
-    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
-    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
-    modelDAO = createModelDAO(db, orm, roadsegmentDAO)
-    db.generate_mapping(create_tables=True)
-
     # create repo
     outboundRepo = OutboundRepo(roadsegmentDAO, outboundDAO)
     travelTimeCalculator = TravelTimeCalculator(outboundRepo)
-    idA=ID("219-57496","57499")
-    idB=ID("219-57496","57498")
-    timeTravel = travelTimeCalculator.calculateTravelTime(idA,idB,10,20) # 2.83436370955463
+    idA = ID("219-57496", "57499")
+    idB = ID("219-57496", "57498")
+    timeTravel = travelTimeCalculator.calculateTravelTime(
+        idA, idB, 10, 20)  # 2.83436370955463
     print(timeTravel)
 
-def runPredictionAPI():
-    roadsegmentDAO = createRoadSegmentDAO(db, orm)
-    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
-    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
-    modelDAO = createModelDAO(db, orm, roadsegmentDAO)
-    db.generate_mapping(create_tables=True)
 
+def runPredictionAPI():
     # create repo
     datasetRepo = DataSetRepo(roadsegmentDAO, datasetDAO)
     modelRepo = ModelRepo(roadsegmentDAO, modelDAO)
     outboundRepo = OutboundRepo(roadsegmentDAO, outboundDAO)
+    roadsegmentRepo = RoadSegmentRepo(roadsegmentDAO, outboundDAO)
     # prepare Model
     predictionModel = PredictionModelV1()
     # prepare dependencies
     mapper = ModelDTOToLinearRegression()
-    travelTimeCalculator = TravelTimeCalculator(outboundRepo)
+    travelTimeCalculator = TravelTimeCalculator(outboundRepo, roadsegmentRepo)
     predictionModelPredictor = PredictionModelPredictor(
         modelRepo, datasetRepo, predictionModel, mapper)
 
-    predictionAPI = PredictTravelTimeService(predictionModelPredictor, travelTimeCalculator)
-    predictionAPI.execute("พระจอม","วงศ์สว่าง")
+    predictionAPI = PredictTravelTimeService(
+        predictionModelPredictor, travelTimeCalculator)
+    print(predictionAPI.execute("พระจอม", "บางโพ"))
+
+
+def runMapPlot():
+    roadsegmentRepo = RoadSegmentRepo(roadsegmentDAO, outboundDAO)
+    graph = Graph(roadsegmentRepo)
+    nodes = graph.getNodes()
+    fig, ax = plt.subplots()
+    plt.xlabel("longitude")
+    plt.ylabel("latitude")
+
+    for key, value in nodes.items():
+        if key.RoadID == 'none':
+            continue
+        [xOrigin, yOrigin] = value.getLatLong()
+        if xOrigin == None or yOrigin == None:
+            continue
+        plt.plot([yOrigin], [xOrigin], marker='o',
+                 color='lightblue')  # 1 plot graph
+        # ax.annotate(value.getRoadName() ,
+        #         (yOrigin, xOrigin), color="red")
+        for neighbour in value.getNeighbourNodes():
+            [x, y] = neighbour.getLatLong()
+            if x == None or y == None:
+                continue
+            plt.plot([yOrigin, y], [xOrigin, x],
+                     color='lightblue', linewidth=3)
+            # print([xOrigin, x],[yOrigin, y])
+
+    # plot destination and source
+    marker_n = ["KMUTNB", "WONGSAWANG", "KRASAUNG", "BANGPO"]
+    marker_lat = [13.818851, 13.82972, 13.84858, 13.806172]
+    marker_long = [100.5138, 100.5266, 100.5147, 100.5215]
+    plt.scatter(marker_long, marker_lat)
+    for i in range(len(marker_n)):
+        ax.annotate(marker_n[i], (marker_long[i], marker_lat[i]))
+
+    plt.show()
 
 
 if __name__ == '__main__':
@@ -137,9 +156,15 @@ if __name__ == '__main__':
 
     db = orm.Database()
     db.bind(provider='sqlite', filename='database.db', create_db=True)
+    roadsegmentDAO = createRoadSegmentDAO(db, orm)
+    outboundDAO = createOutboundDAO(db, orm, roadsegmentDAO)
+    datasetDAO = createDatasetDAO(db, orm, roadsegmentDAO)
+    modelDAO = createModelDAO(db, orm, roadsegmentDAO)
+    db.generate_mapping(create_tables=True)
+    # migrate(db)
     # runExtraction(db)
     # runTrainModel()
     # runPredictModel()
     # runTravelTimeCalculator()
     runPredictionAPI()
-    # migrate(db)
+    # runMapPlot()

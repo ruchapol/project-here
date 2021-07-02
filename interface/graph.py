@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List
+from typing import List, Tuple
 from model.ID import ID
 
 class IGraph:
@@ -20,6 +20,9 @@ class INode:
         raise NotImplementedError
 
     def getSegmentName(self) -> str:
+        raise NotImplementedError
+    
+    def getLatLong(self) -> Tuple[float,float]:
         raise NotImplementedError
 
     def addInboundNode(self, node: INode):

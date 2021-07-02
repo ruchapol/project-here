@@ -17,7 +17,13 @@ class RoadSegmentRepo(IRepository):
     @db_session
     def find(self, id: ID) -> RoadSegmentDTO:
         dao = self.roadSegmentDAO[id.RoadID, id.SegmentID]
-        roadSegmentDTO: RoadSegmentDTO = dao
+        roadSegmentDTO = RoadSegmentDTO()
+        roadSegmentDTO.LatLong = dao.LatLong
+        roadSegmentDTO.RoadID = dao.RoadID
+        roadSegmentDTO.RoadSegmentID = dao.RoadSegmentID
+        roadSegmentDTO.RoadDescription = dao.RoadDescription
+        roadSegmentDTO.RoadSegmentDescription = dao.RoadSegmentDescription
+        # roadSegmentDTO.RowID = dao.RowID
         toTmp = [t.To for t in dao.From]
         roadSegmentDTO.To = [ID(x.RoadID,x.RoadSegmentID) for x in toTmp]
         return roadSegmentDTO

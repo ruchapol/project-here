@@ -2,16 +2,19 @@ from re import I
 from travelTimeCalculator.travelTimeCalculator import TravelTimeCalculator
 from predictionModel.predictionModelPredictor import PredictionModelPredictor
 from model.ID import ID
+from datetime import timedelta
+import numpy as np
+
 
 class PredictTravelTimeService:
     predictor: PredictionModelPredictor
-    travelTimeCalculator :TravelTimeCalculator
+    travelTimeCalculator: TravelTimeCalculator
 
     def __init__(self, predictor: PredictionModelPredictor, travelTimeCalculator: TravelTimeCalculator):
         self.predictor = predictor
         self.travelTimeCalculator = travelTimeCalculator
 
-    def execute(self, source: str, destination: str, miniteAhead:str="5") -> str:
+    def execute(self, source: str, destination: str, miniteAhead: str = "5") -> str:
         paths = self.shortest_path(source, destination)
         i = 0
         timeTravel = 0
@@ -20,10 +23,11 @@ class PredictTravelTimeService:
             idB = paths[i+1]
             speedA = self.predictor.predictSpeedUncutFromNow(idA, miniteAhead)
             speedB = self.predictor.predictSpeedUncutFromNow(idB, miniteAhead)
-            timeTravel += self.travelTimeCalculator.calculateTravelTime(idA, idB, speedA, speedB)
-            print(timeTravel)
-            i+=1
-        return "15"
+            timeTravelAToB = self.travelTimeCalculator.calculateTravelTimeNoOutbound(
+                idA, idB, speedA, speedB)
+            timeTravel += timeTravelAToB
+            i += 1
+        return timedelta(hours=np.float64(timeTravel)).total_seconds() # second
 
     def shortest_path(self, start_point="พระจอม", dest_point="วงศ์สว่าง"):
         # marker_n = ["พระจอม", "วงศ์สว่าง", "กระทรวง", "บางโพ"]

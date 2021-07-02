@@ -30,7 +30,7 @@ class Graph(IGraph):
             return node
         RoadDescription = roadSegment.RoadDescription
         RoadSegmentDescription = roadSegment.RoadSegmentDescription
-        node = Node(id, RoadDescription, RoadSegmentDescription)
+        node = Node(id, RoadDescription, RoadSegmentDescription, roadSegment.LatLong)
         self.addNode(node)
         return node
 
@@ -42,6 +42,8 @@ class Graph(IGraph):
             return self.nodes[id]
         return None
 
+    def getNodes(self) -> Dict[ID, INode]:
+        return self.nodes
 
 class Node(INode):
     id: ID
@@ -51,10 +53,11 @@ class Node(INode):
     inboundNodes: List[Node]
     outboundNodes: List[Node]
 
-    def __init__(self, id: ID, roadName: str, segmentName: str) -> Node:
+    def __init__(self, id: ID, roadName: str, segmentName: str, latLong: str = "") -> Node:
         self.id = id
         self.roadName = roadName
         self.segmentName = segmentName
+        self.latLong = latLong
         self.inboundNodes = []
         self.outboundNodes = []
 
@@ -69,6 +72,11 @@ class Node(INode):
 
     def getSegmentName(self) -> str:
         return self.segmentName
+
+    def getLatLong(self) -> Tuple[float,float]:
+        if self.latLong == 'none':
+            return [None,None]
+        return [float(x) for x in self.latLong.split(",")]
 
     def addInboundNode(self, node: Node):
         if node not in self.inboundNodes:

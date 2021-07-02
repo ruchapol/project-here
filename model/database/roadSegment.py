@@ -1,7 +1,7 @@
 from pony.orm import Database
 from pony import orm
 from pony.orm.core import PrimaryKey
-from typing import List
+from typing import List, Tuple
 from model.ID import ID
 
 class RoadSegmentDTO:
@@ -12,6 +12,11 @@ class RoadSegmentDTO:
     RoadSegmentDescription: str
     LatLong: str
     To: List[ID]
+
+    def getLatLong(self) -> Tuple[float,float]:
+        if self.LatLong == "":
+            return [None,None]
+        return (float(x) for x in self.LatLong.split(","))
 
 class OutboundDTO:
     OutboundID: int
