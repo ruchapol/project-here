@@ -46,7 +46,7 @@ def runExtraction(db: orm.Database):
         for hour in tqdm(listdir(join(tfPath, day))):
             for minute in listdir(join(tfPath, day, hour)):
                 xmlPath = join(tfPath, day, hour, minute)
-                apiInputs: Dict[ID, APIInput] = getAPIInputsFromXML(xmlPath)
+                apiInputs: Dict[ID, APIInput] = getAPIInputsFromXML(xmlPath) # change to getAPIInputs from here api
                 featureExtraction.setAPIInputs(apiInputs)
                 datasets = featureExtraction.processInput()
                 featureExtraction.saveToDB(datasets)

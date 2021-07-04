@@ -67,28 +67,28 @@ class DataSetRepo(IRepository):
 
     @db_session
     def _findAvgJamFactorDuration(self, id: ID) -> float:
-        print("_findAvgJamFactorDuration")
+        # print("_findAvgJamFactorDuration")
         avgVal = avg(
             x.JamFactorDuration for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
         return self._ifNoneReturnZero(avgVal)
 
     @db_session
     def _findAvgDeltaJamFactor(self, id: ID) -> float:
-        print("_findAvgDeltaJamFactor")
+        # print("_findAvgDeltaJamFactor")
         avgVal = avg(
             x.DeltaJamFactor for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
         return self._ifNoneReturnZero(avgVal)
 
     @db_session
     def _findAvgNeightbourJamFactor(self, id: ID) -> float:
-        print("_findAvgNeightbourJamFactor")
+        # print("_findAvgNeightbourJamFactor")
         avgVal = avg(
             x.NeightbourJamFactor for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
         return self._ifNoneReturnZero(avgVal)
 
     @db_session
     def _findAvgNeightbourJamFactorDuration(self, id: ID) -> float:
-        print("_findAvgNeightbourJamFactorDuration")
+        # print("_findAvgNeightbourJamFactorDuration")
         avgVal = avg(
             x.NeightbourJamFactorDuration for x in self.roadSegmentDAO[id.RoadID, id.SegmentID].Features)
         return self._ifNoneReturnZero(avgVal)

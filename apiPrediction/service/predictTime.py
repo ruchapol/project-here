@@ -14,20 +14,26 @@ class PredictTravelTimeService:
         self.predictor = predictor
         self.travelTimeCalculator = travelTimeCalculator
 
-    def execute(self, source: str, destination: str, miniteAhead: str = "5") -> str:
-        paths = self.shortest_path(source, destination)
-        i = 0
-        timeTravel = 0
-        while i < len(paths) - 1:
-            idA = paths[i]
-            idB = paths[i+1]
-            speedA = self.predictor.predictSpeedUncutFromNow(idA, miniteAhead)
-            speedB = self.predictor.predictSpeedUncutFromNow(idB, miniteAhead)
-            timeTravelAToB = self.travelTimeCalculator.calculateTravelTimeNoOutbound(
-                idA, idB, speedA, speedB)
-            timeTravel += timeTravelAToB
-            i += 1
-        return timedelta(hours=np.float64(timeTravel)).total_seconds() # second
+    def execute(self,  destination: str, miniteAhead: str = "5", source: str = "พระจอม") -> str:
+        try:
+            paths = self.shortest_path(source, destination)
+            i = 0
+            timeTravel = 0
+            while i < len(paths) - 1:
+                idA = paths[i]
+                idB = paths[i+1]
+                speedA = self.predictor.predictSpeedUncutFromNow(
+                    idA, miniteAhead)
+                speedB = self.predictor.predictSpeedUncutFromNow(
+                    idB, miniteAhead)
+                timeTravelAToB = self.travelTimeCalculator.calculateTravelTimeNoOutbound(
+                    idA, idB, speedA, speedB)
+                timeTravel += timeTravelAToB
+                i += 1
+        except KeyError as ke:
+            return {"status": 500, "travelTime": timedelta(hours=np.float64(timeTravel)).total_seconds(), "error": "minute is not found"}
+        # second
+        return {"status": 200, "travelTime": timedelta(hours=np.float64(timeTravel)).total_seconds()}
 
     def shortest_path(self, start_point="พระจอม", dest_point="วงศ์สว่าง"):
         # marker_n = ["พระจอม", "วงศ์สว่าง", "กระทรวง", "บางโพ"]
